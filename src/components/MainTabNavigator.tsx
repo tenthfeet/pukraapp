@@ -20,25 +20,28 @@ const MainTabNavigator = () => {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarActiveTintColor: "#1D5D9B",
-        tabBarInactiveTintColor: "#555",
-        tabBarIcon: ({ color, size }) => {
-          let iconName: string = "home";
+        tabBarActiveTintColor: "#1D5D9B", // Active icon color
+        tabBarInactiveTintColor: "#555",  // Inactive icon color
+        tabBarIcon: ({ focused, color, size }) => {
+          let iconName: string;
 
           switch (route.name) {
             case "Home":
-              iconName = "home-outline";
+              iconName = focused ? "home" : "home-outline";
               break;
             case "FindDoctor":
-              iconName = "medkit-outline";
+              iconName = focused ? "medkit" : "medkit-outline";
               break;
             case "BookAppointment":
-              iconName = "calendar-outline";
+              iconName = focused ? "calendar" : "calendar-outline";
               break;
             case "Profile":
-              iconName = "person-outline";
+              iconName = focused ? "person" : "person-outline";
               break;
+            default:
+              iconName = "ellipse";
           }
+
           return <Ionicons name={iconName as any} size={size} color={color} />;
         },
       })}
