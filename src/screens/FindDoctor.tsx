@@ -56,8 +56,9 @@ const FindDoctor: React.FC = () => {
           degree: doc.qualification || "",
           role: doc.specialization || "",
           img:
-            doc.photo?.original_url ||
-            "https://cdn-icons-png.flaticon.com/512/387/387561.png",
+            doc.photo?.original_url.replace(
+              'http://localhost:8000',API_URLS.BASE_URL
+            )
         }));
 
         setDoctors(mappedDoctors);
