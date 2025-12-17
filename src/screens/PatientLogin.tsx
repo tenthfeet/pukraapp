@@ -7,6 +7,7 @@ import {
   StyleSheet,
   ActivityIndicator,
   Alert,
+  Image,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
@@ -60,6 +61,11 @@ const PatientLogin: React.FC = () => {
   return (
     <View style={styles.overlay}>
       <View style={styles.card}>
+ <Image
+  source={require("../assets/PUKRA-Logo.png")}
+  style={styles.logo}
+  resizeMode="contain"
+/>
         <Text style={styles.title}>Patient Login</Text>
 
         {/* EMAIL */}
@@ -134,10 +140,10 @@ const styles = StyleSheet.create({
   },
 
   title: {
-    fontSize: 22,
+    fontSize: 23,
     fontWeight: "bold",
     textAlign: "center",
-    marginBottom: 16,
+    marginBottom: 25,
   },
 
   input: {
@@ -179,5 +185,11 @@ const styles = StyleSheet.create({
   registerBtn: {
     color: "#2563EB",
     fontWeight: "600",
+  },
+   logo: {
+    width: 120,
+    height: 120,
+    alignSelf: "center",
+    // marginBottom: 2,
   },
 });

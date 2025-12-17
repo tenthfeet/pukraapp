@@ -9,6 +9,7 @@ import {
   Alert,
   KeyboardAvoidingView,
   Platform,
+  Image,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import type { NativeStackNavigationProp } from "@react-navigation/native-stack";
@@ -82,6 +83,13 @@ export default function PatientRegister() {
       style={styles.overlay}
     >
       <View style={styles.card}>
+        <Image
+          source={require("../assets/PUKRA-Logo.png")}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+        
+        
         <Text style={styles.title}>Patient Registration</Text>
 
         <TextInput
@@ -200,5 +208,11 @@ const styles = StyleSheet.create({
   link: {
     color: "#1D5D9B",
     fontWeight: "bold",
+  },
+   logo: {
+    width: 120,
+    height: 120,
+    alignSelf: "center",
+    // marginBottom: 2,
   },
 });
