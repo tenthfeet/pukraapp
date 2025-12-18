@@ -11,6 +11,7 @@ import {
   Alert,
 } from "react-native";
 import Icon from "react-native-vector-icons/Feather";
+import { useNavigation } from '@react-navigation/native';
 import { launchImageLibrary } from "react-native-image-picker";
 import PatientApi from "../utils/Patient_Api";
 import API_URLS from "../config/API_URLS";
@@ -35,6 +36,7 @@ interface Passwords {
 }
 
 const PatientProfile: React.FC = () => {
+  const navigation = useNavigation<any>();
   const [pageLoading, setPageLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -283,6 +285,13 @@ const PatientProfile: React.FC = () => {
           <Text style={styles.btnText}>Change Password</Text>
         </TouchableOpacity>
       )}
+      {/* Logout Button */}
+        <TouchableOpacity
+          style={styles.passwordBtn}
+         onPress={() => navigation.navigate('Login')}
+        >
+          <Text style={styles.btnText}>Log Out</Text>
+        </TouchableOpacity>
 
       {showPasswordForm && (
         <>
@@ -410,5 +419,6 @@ const styles = StyleSheet.create({
     textAlign: "center",
     color: "#fff",
     fontWeight: "700",
+    cursor:"pointer",
   },
 });
