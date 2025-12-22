@@ -74,45 +74,28 @@ const MainTabNavigator = () => {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarShowLabel: false,
-
-        tabBarIcon: ({ focused }) => {
-          let iconSource;
+        tabBarActiveTintColor: "#1D5D9B",
+        tabBarInactiveTintColor: "#555",
+        tabBarIcon: ({ color, size }) => {
+          let iconName: string = "home";
 
           switch (route.name) {
             case "Home":
-               iconSource = focused
-              ? require("../assets/icons/HomeImageActive1.png")
-              : require("../assets/icons/HomeImage.png");
+              iconName = "home-outline";
               break;
             case "FindDoctor":
-              iconSource = focused
-        ? require("../assets/icons/DoctorImageActive.jpg")
-        : require("../assets/icons/DoctorImage1.png");
+              iconName = "medkit-outline";
               break;
             case "BookAppointment":
-               iconSource = focused
-        ? require("../assets/icons/BookAppointmentImageActive.jpg")
-        : require("../assets/icons/BookAppointment2.png");
+              iconName = "calendar-outline";
               break;
             case "Profile":
-              iconSource = focused
-        ? require("../assets/icons/ProfileImageActive.png")
-        : require("../assets/icons/ProfileImage.png");
+              iconName = "person-outline";
               break;
+            default:
+              iconName = "ellipse";
           }
-
-          return (
-            <Image
-              source={iconSource}
-              style={{
-                width: 28,
-                height: 30,
-              }}
-              resizeMode="contain"
-            />
-
-          );
+          return <Ionicons name={iconName as any} size={size} color={color} />;
         },
       })}
     >

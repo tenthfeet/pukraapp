@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -8,10 +8,10 @@ import {
   StyleSheet,
   ActivityIndicator,
   Alert,
-} from "react-native";
-import emailjs from "emailjs-com";
-import Api from "../utils/Api";
-import API_URLS from "../config/API_URLS";
+} from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import Api from '../utils/Api';
+import API_URLS from '../config/API_URLS';
 
 interface FormState {
   name: string;
@@ -23,78 +23,79 @@ interface FormState {
   description: string;
 }
 
+type PickerMode = 'date' | 'time' | null;
+
 const BookAppointment: React.FC = () => {
-  const [btnLoading, setBtnLoading] = useState<boolean>(false);
+  const [btnLoading, setBtnLoading] = useState(false);
+  const [pickerMode, setPickerMode] = useState<PickerMode>(null);
 
   const [formData, setFormData] = useState<FormState>({
-    name: "",
-    email: "",
-    phone: "",
-    date: "",
-    time: "",
-    symptoms: "",
-    description: "",
+    name: '',
+    email: '',
+    phone: '',
+    date: '',
+    time: '',
+    symptoms: '',
+    description: '',
   });
 
   const handleChange = (key: keyof FormState, value: string) => {
-    setFormData({ ...formData, [key]: value });
+    setFormData(prev => ({ ...prev, [key]: value }));
   };
 
-  const sendEmail = async () => {
+  /* ================= SUBMIT APPOINTMENT ================= */
+
+  const submitAppointment = async () => {
     if (
       !formData.name ||
       !formData.email ||
       !formData.phone ||
       !formData.date ||
-      !formData.time ||
-      !formData.symptoms ||
-      !formData.description
+      !formData.time
     ) {
-      Alert.alert("Validation Error", "Please fill all fields");
+      Alert.alert('Validation Error', 'Please fill all required fields');
       return;
     }
 
-    setBtnLoading(true);
-
     try {
-      // Save to Backend
-      await Api.post(API_URLS.APPOINTMENTS, formData);
+      setBtnLoading(true);
+      console.log('Appointment form data', formData);
 
-      // Send Email via EmailJS
-      await emailjs.send(
-        "service_w1td76c", // Service ID
-        "template_cs39cld", // Template ID
-        {
-          patient_name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          preferredDate: formData.date,
-          timeSlot: formData.time,
-          symptoms: formData.symptoms,
-          description: formData.description,
-        },
-        "9IiQILbseS_yDnazv" // Public Key
+      const result = await Api.post(API_URLS.APPOINTMENTS, {
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        date: formData.date, // YYYY-MM-DD
+        time: formData.time, // HH:mm
+        symptoms: formData.symptoms,
+        description: formData.description,
+      });
+
+      console.log('Appointment API result', result);
+
+      Alert.alert(
+        '✅ Appointment Booked',
+        'Our team will contact you shortly.'
       );
 
-      Alert.alert("Success ✅", "Consultation request sent successfully!");
-
-      // Reset Form
       setFormData({
-        name: "",
-        email: "",
-        phone: "",
-        date: "",
-        time: "",
-        symptoms: "",
-        description: "",
+        name: '',
+        email: '',
+        phone: '',
+        date: '',
+        time: '',
+        symptoms: '',
+        description: '',
       });
-    } catch (error) {
-      console.error(error);
-      Alert.alert("Error ❌", "Failed to submit request");
+    } catch (error: any) {
+      console.log(error?.response?.data);
+      Alert.alert('❌ Failed', 'Please try again later');
     } finally {
       setBtnLoading(false);
     }
   };
+
+  /* ================= UI ================= */
 
   return (
     <ScrollView style={styles.container}>
@@ -105,13 +106,11 @@ const BookAppointment: React.FC = () => {
         </Text>
       </View>
 
-      <Text style={styles.sectionTitle}>Book Your Consultation</Text>
-
       <TextInput
         style={styles.input}
         placeholder="Patient Name"
         value={formData.name}
-        onChangeText={(text) => handleChange("name", text)}
+        onChangeText={t => handleChange('name', t)}
       />
 
       <TextInput
@@ -119,7 +118,7 @@ const BookAppointment: React.FC = () => {
         placeholder="Email"
         keyboardType="email-address"
         value={formData.email}
-        onChangeText={(text) => handleChange("email", text)}
+        onChangeText={t => handleChange('email', t)}
       />
 
       <TextInput
@@ -127,53 +126,75 @@ const BookAppointment: React.FC = () => {
         placeholder="Phone"
         keyboardType="phone-pad"
         value={formData.phone}
-        onChangeText={(text) => handleChange("phone", text)}
+        onChangeText={t => handleChange('phone', t)}
       />
 
-      <TextInput
+      {/* DATE */}
+      <TouchableOpacity
         style={styles.input}
-        placeholder="Preferred Date (YYYY-MM-DD)"
-        value={formData.date}
-        onChangeText={(text) => handleChange("date", text)}
-      />
+        onPress={() => setPickerMode('date')}
+      >
+        <Text>{formData.date || 'Select Date'}</Text>
+      </TouchableOpacity>
 
-      <TextInput
+      {/* TIME */}
+      <TouchableOpacity
         style={styles.input}
-        placeholder="Time Slot (HH:MM)"
-        value={formData.time}
-        onChangeText={(text) => handleChange("time", text)}
-      />
+        onPress={() => setPickerMode('time')}
+      >
+        <Text>{formData.time || 'Select Time'}</Text>
+      </TouchableOpacity>
+
+      {/* SINGLE PICKER (HOOK SAFE) */}
+      {pickerMode && (
+        <DateTimePicker
+          value={new Date()}
+          mode={pickerMode}
+          is24Hour
+          display="default"
+          onChange={(event, selectedDate) => {
+            setPickerMode(null);
+            if (!selectedDate) return;
+
+            if (pickerMode === 'date') {
+              handleChange(
+                'date',
+                selectedDate.toISOString().split('T')[0]
+              );
+            } else {
+              handleChange(
+                'time',
+                selectedDate.toTimeString().slice(0, 5)
+              );
+            }
+          }}
+        />
+      )}
 
       <TextInput
         style={styles.input}
         placeholder="Symptoms"
         value={formData.symptoms}
-        onChangeText={(text) => handleChange("symptoms", text)}
+        onChangeText={t => handleChange('symptoms', t)}
       />
 
       <TextInput
         style={[styles.input, styles.textArea]}
         placeholder="Description"
         multiline
-        numberOfLines={4}
         value={formData.description}
-        onChangeText={(text) => handleChange("description", text)}
+        onChangeText={t => handleChange('description', t)}
       />
 
       <TouchableOpacity
-        style={[
-          styles.button,
-          btnLoading && styles.disabledButton,
-        ]}
-        onPress={sendEmail}
+        style={[styles.button, btnLoading && styles.disabledButton]}
+        onPress={submitAppointment}
         disabled={btnLoading}
       >
         {btnLoading ? (
           <ActivityIndicator color="#fff" />
         ) : (
-          <Text style={styles.buttonText}>
-            Submit Consultation Request →
-          </Text>
+          <Text style={styles.buttonText}>Submit Appointment</Text>
         )}
       </TouchableOpacity>
     </ScrollView>
@@ -182,10 +203,12 @@ const BookAppointment: React.FC = () => {
 
 export default BookAppointment;
 
+/* ================= STYLES ================= */
+
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     padding: 20,
   },
   header: {
@@ -193,45 +216,38 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: 26,
-    fontWeight: "bold",
-    color: "#1e3a8a",
+    fontWeight: 'bold',
+    color: '#606C32',
   },
   subtitle: {
     fontSize: 14,
-    color: "#555",
+    color: '#555',
     marginTop: 4,
-  },
-  sectionTitle: {
-    fontSize: 20,
-    fontWeight: "bold",
-    marginBottom: 16,
-    marginTop: 10,
   },
   input: {
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: '#ccc',
     borderRadius: 8,
     padding: 12,
     marginBottom: 12,
-    backgroundColor: "#f9f9f9",
+    backgroundColor: '#f9f9f9',
   },
   textArea: {
     height: 100,
-    textAlignVertical: "top",
+    textAlignVertical: 'top',
   },
   button: {
-    backgroundColor: "#606C32",
+    backgroundColor: '#606C32',
     padding: 16,
     borderRadius: 8,
-    alignItems: "center",
+    alignItems: 'center',
     marginTop: 10,
   },
   disabledButton: {
-    backgroundColor: "#999",
+    backgroundColor: '#999',
   },
   buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
+    color: '#fff',
+    fontWeight: 'bold',
   },
 });
-

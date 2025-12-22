@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -12,11 +12,12 @@ import {
   ScrollView,
   Alert,
   Dimensions,
-} from "react-native";
-import Api from "../utils/Api";
-import API_URLS from "../config/API_URLS";
+} from 'react-native';
+import DateTimePicker from '@react-native-community/datetimepicker';
+import Api from '../utils/Api';
+import API_URLS from '../config/API_URLS';
 
-const { width } = Dimensions.get("window");
+const { width } = Dimensions.get('window');
 
 interface Doctor {
   name: string;
@@ -28,59 +29,63 @@ interface Doctor {
 const FindDoctor: React.FC = () => {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [filteredDoctors, setFilteredDoctors] = useState<Doctor[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
 
-  const [showPopup, setShowPopup] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
   const [btnLoading, setBtnLoading] = useState(false);
 
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
+
   const [form, setForm] = useState({
-    name: "",
-    email: "",
-    phone: "",
-    date: "",
-    time: "",
-    symptoms: "",
-    description: "",
+    name: '',
+    email: '',
+    phone: '',
+    date: '',
+    time: '',
+    symptoms: '',
+    description: '',
   });
 
   /* ================= FETCH DOCTORS ================= */
 
   useEffect(() => {
     Api.get(API_URLS.DOCTORS)
-      .then((res) => {
-        const mappedDoctors = res.data.doctors.map((doc: any) => ({
+      .then(res => {
+        const mapped = res.data.doctors.map((doc: any) => ({
           name: doc.name,
-          degree: doc.qualification || "",
-          role: doc.specialization || "",
-          img:
-            doc.photo?.original_url.replace(
-              'http://localhost:8000',API_URLS.BASE_URL
-            )
+          degree: doc.qualification || '',
+          role: doc.specialization || '',
+          img: doc.photo?.original_url
+            ? doc.photo.original_url.replace(
+                'http://localhost:8000',
+                API_URLS.BASE_URL,
+              )
+            : 'https://via.placeholder.com/300',
         }));
 
-        setDoctors(mappedDoctors);
-        setFilteredDoctors(mappedDoctors);
-        setLoading(false);
+        setDoctors(mapped);
+        setFilteredDoctors(mapped);
       })
-      .catch(() => setLoading(false));
+      .catch(() => Alert.alert('Error', 'Failed to load doctors'))
+      .finally(() => setLoading(false));
   }, []);
 
   /* ================= FILTER ================= */
 
   useEffect(() => {
-    const filtered = doctors.filter((doc) => {
-      const search = searchTerm.toLowerCase();
-      return (
-        doc.name.toLowerCase().includes(search) ||
-        doc.role.toLowerCase().includes(search) ||
-        doc.degree.toLowerCase().includes(search)
-      );
-    });
-
-    setFilteredDoctors(filtered);
+    const s = searchTerm.toLowerCase();
+    setFilteredDoctors(
+      doctors.filter(
+        doc =>
+          doc.name.toLowerCase().includes(s) ||
+          doc.role.toLowerCase().includes(s) ||
+          doc.degree.toLowerCase().includes(s),
+      ),
+    );
   }, [searchTerm, doctors]);
 
   /* ================= SUBMIT APPOINTMENT ================= */
@@ -88,43 +93,51 @@ const FindDoctor: React.FC = () => {
   const submitAppointment = async () => {
     if (!selectedDoctor) return;
 
+    if (!form.name || !form.email || !form.phone || !form.date || !form.time) {
+      Alert.alert('Validation', 'Please fill all required fields');
+      return;
+    }
+
     try {
       setBtnLoading(true);
+      console.log('Appointments form data', form);
 
-      await Api.post(API_URLS.APPOINTMENTS, {
+      var result = await Api.post(API_URLS.APPOINTMENTS, {
         doctor_name: selectedDoctor.name,
         name: form.name,
         email: form.email,
         phone: form.phone,
-        date: form.date,
-        time: form.time,
+        date: form.date, // YYYY-MM-DD
+        time: form.time, // HH:mm ✅
         symptoms: form.symptoms,
         description: form.description,
       });
+      console.log('Appointments api result', result);
 
       Alert.alert(
-        "✅ Appointment Booked",
-        "Our team will contact you shortly."
+        '✅ Appointment Booked',
+        'Our team will contact you shortly.',
       );
 
       setShowPopup(false);
       setForm({
-        name: "",
-        email: "",
-        phone: "",
-        date: "",
-        time: "",
-        symptoms: "",
-        description: "",
+        name: '',
+        email: '',
+        phone: '',
+        date: '',
+        time: '',
+        symptoms: '',
+        description: '',
       });
-    } catch (err) {
-      Alert.alert("❌ Failed", "Please try again later.");
+    } catch (err: any) {
+      console.log(err?.response?.data);
+      Alert.alert('❌ Failed', 'Please try again later');
     } finally {
       setBtnLoading(false);
     }
   };
 
-  /* ================= RENDER DOCTOR ================= */
+  /* ================= RENDER DOCTOR CARD ================= */
 
   const renderDoctor = ({ item }: { item: Doctor }) => (
     <View style={styles.card}>
@@ -141,7 +154,7 @@ const FindDoctor: React.FC = () => {
             setShowProfile(true);
           }}
         >
-          <Text style={styles.outlinedText}>View Profile</Text>
+          <Text style={styles.outlinedText}>View</Text>
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -161,8 +174,8 @@ const FindDoctor: React.FC = () => {
 
   return (
     <ScrollView style={styles.container}>
-      {/* HEADER */}
       <Text style={styles.title}>Find a Doctor</Text>
+
       <TextInput
         style={styles.search}
         placeholder="Search by name, degree or speciality"
@@ -170,7 +183,6 @@ const FindDoctor: React.FC = () => {
         onChangeText={setSearchTerm}
       />
 
-      {/* DOCTORS LIST */}
       {loading ? (
         <ActivityIndicator size="large" />
       ) : (
@@ -179,44 +191,12 @@ const FindDoctor: React.FC = () => {
           renderItem={renderDoctor}
           keyExtractor={(_, i) => i.toString()}
           numColumns={2}
-          contentContainerStyle={{ paddingBottom: 80 }}
+          scrollEnabled={false}
         />
       )}
 
-      {/* PROFILE MODAL */}
-      <Modal visible={showProfile} transparent animationType="slide">
-        <View style={styles.modalBg}>
-          <View style={styles.modalCard}>
-            <Image
-              source={{ uri: selectedDoctor?.img }}
-              style={styles.profileImg}
-            />
-            <Text style={styles.profileName}>
-              {selectedDoctor?.name}
-            </Text>
-            <Text>{selectedDoctor?.degree}</Text>
-            <Text style={{ color: "#606C32" }}>
-              {selectedDoctor?.role}
-            </Text>
+      {/* ================= BOOKING MODAL ================= */}
 
-            <TouchableOpacity
-              style={styles.mainBtn}
-              onPress={() => {
-                setShowProfile(false);
-                setShowPopup(true);
-              }}
-            >
-              <Text style={{ color: "#fff" }}>Book Appointment</Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity onPress={() => setShowProfile(false)}>
-              <Text style={{ color: "red", marginTop: 10 }}>Close</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-
-      {/* BOOKING MODAL */}
       <Modal visible={showPopup} transparent animationType="slide">
         <View style={styles.modalBg}>
           <View style={styles.modalCard}>
@@ -224,29 +204,105 @@ const FindDoctor: React.FC = () => {
               Book with {selectedDoctor?.name}
             </Text>
 
-            {Object.keys(form).map((key) => (
-              <TextInput
-                key={key}
-                placeholder={key}
-                style={styles.input}
-                onChangeText={(t) =>
-                  setForm((p) => ({ ...p, [key]: t }))
-                }
+            <TextInput
+              placeholder="Patient Name"
+              style={styles.input}
+              value={form.name}
+              onChangeText={t => setForm({ ...form, name: t })}
+            />
+
+            <TextInput
+              placeholder="Email"
+              style={styles.input}
+              keyboardType="email-address"
+              value={form.email}
+              onChangeText={t => setForm({ ...form, email: t })}
+            />
+
+            <TextInput
+              placeholder="Phone"
+              style={styles.input}
+              keyboardType="phone-pad"
+              value={form.phone}
+              onChangeText={t => setForm({ ...form, phone: t })}
+            />
+
+            {/* DATE */}
+            <TouchableOpacity
+              style={styles.input}
+              onPress={() => setShowDatePicker(true)}
+            >
+              <Text>{form.date || 'Select Date'}</Text>
+            </TouchableOpacity>
+
+            {showDatePicker && (
+              <DateTimePicker
+                value={new Date()}
+                mode="date"
+                onChange={(e, d) => {
+                  setShowDatePicker(false);
+                  if (d) {
+                    setForm({
+                      ...form,
+                      date: d.toISOString().split('T')[0],
+                    });
+                  }
+                }}
               />
-            ))}
+            )}
+
+            {/* TIME */}
+            <TouchableOpacity
+              style={styles.input}
+              onPress={() => setShowTimePicker(true)}
+            >
+              <Text>{form.time || 'Select Time'}</Text>
+            </TouchableOpacity>
+
+            {showTimePicker && (
+              <DateTimePicker
+                value={new Date()}
+                mode="time"
+                is24Hour={true}
+                onChange={(e, t) => {
+                  setShowTimePicker(false);
+                  if (t) {
+                    setForm({
+                      ...form,
+                      time: t.toTimeString().slice(0, 5), // ✅ FIX
+                    });
+                  }
+                }}
+              />
+            )}
+
+            <TextInput
+              placeholder="Symptoms"
+              style={styles.input}
+              value={form.symptoms}
+              onChangeText={t => setForm({ ...form, symptoms: t })}
+            />
+
+            <TextInput
+              placeholder="Description"
+              multiline
+              style={[styles.input, { height: 90 }]}
+              value={form.description}
+              onChangeText={t => setForm({ ...form, description: t })}
+            />
 
             <TouchableOpacity
               style={styles.mainBtn}
               onPress={submitAppointment}
               disabled={btnLoading}
             >
-              <Text style={{ color: "#fff" }}>
-                {btnLoading ? "Processing..." : "Submit"}
+              <Text style={{ color: '#fff' }}>
+                {btnLoading ? 'Processing...' : 'Submit'}
               </Text>
             </TouchableOpacity>
 
             <TouchableOpacity onPress={() => setShowPopup(false)}>
-              <Text style={{ color: "red", marginTop: 10 }}>Cancel</Text>
+              <Text style={{ color: 'red', marginTop: 10 }}>Cancel</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -260,80 +316,80 @@ export default FindDoctor;
 /* ================= STYLES ================= */
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: "#F9FAFB", padding: 16 },
+  container: { flex: 1, backgroundColor: '#F9FAFB', padding: 16 },
 
-  title: { fontSize: 26, fontWeight: "bold", color: "#606C32" },
+  title: { fontSize: 26, fontWeight: 'bold', color: '#606C32' },
 
   search: {
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: '#ccc',
     borderRadius: 10,
     padding: 10,
     marginVertical: 10,
   },
 
   card: {
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     width: width / 2 - 24,
     margin: 8,
     padding: 10,
     borderRadius: 16,
-    alignItems: "center",
+    alignItems: 'center',
   },
 
-  img: { width: "100%", height: 140, borderRadius: 12 },
+  img: { width: '100%', height: 140, borderRadius: 12 },
 
-  name: { fontWeight: "bold", marginTop: 6 },
-  degree: { fontSize: 12, color: "#555" },
-  role: { color: "#606C32", fontWeight: "600" },
+  name: { fontWeight: 'bold', marginTop: 6 },
+  degree: { fontSize: 12, color: '#555' },
+  role: { color: '#606C32', fontWeight: '600' },
 
-  btnRow: { flexDirection: "row", marginTop: 10 },
+  btnRow: { flexDirection: 'row', marginTop: 10 },
 
   outlinedBtn: {
     borderWidth: 1,
-    borderColor: "#606C32",
+    borderColor: '#606C32',
     padding: 6,
     borderRadius: 20,
     marginHorizontal: 4,
   },
 
-  outlinedText: { color: "#606C32", fontSize: 12 },
+  outlinedText: { color: '#606C32', fontSize: 12 },
 
   modalBg: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.6)",
-    justifyContent: "center",
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'center',
   },
 
   modalCard: {
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     margin: 20,
     padding: 20,
     borderRadius: 16,
-    alignItems: "center",
+    alignItems: 'center',
   },
 
-  modalTitle: { fontWeight: "bold", fontSize: 18, marginBottom: 10 },
+  modalTitle: { fontWeight: 'bold', fontSize: 18, marginBottom: 10 },
 
   profileImg: { width: 120, height: 120, borderRadius: 60 },
 
-  profileName: { fontSize: 20, fontWeight: "bold", color: "#606C32" },
+  profileName: { fontSize: 20, fontWeight: 'bold', color: '#606C32' },
 
   input: {
     borderWidth: 1,
-    borderColor: "#ccc",
-    width: "100%",
+    borderColor: '#ccc',
+    width: '100%',
     padding: 10,
     borderRadius: 8,
     marginVertical: 6,
   },
 
   mainBtn: {
-    backgroundColor: "#606C32",
+    backgroundColor: '#606C32',
     padding: 12,
     marginTop: 10,
     borderRadius: 10,
-    width: "100%",
-    alignItems: "center",
+    width: '100%',
+    alignItems: 'center',
   },
 });

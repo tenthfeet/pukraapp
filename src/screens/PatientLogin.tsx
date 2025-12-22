@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -8,50 +8,64 @@ import {
   ActivityIndicator,
   Alert,
   Image,
+<<<<<<< HEAD
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import PatientApi from "../utils/Patient_Api";
 import API_URLS from "../config/API_URLS";
+=======
+} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import PatientApi from '../utils/Patient_Api';
+import API_URLS from '../config/API_URLS';
+>>>>>>> 49be0b43cc69b6855ef8cc21d57304c6f6261bd2
 
 const PatientLogin: React.FC = () => {
   const navigation = useNavigation<any>();
 
-  const [email, setEmail] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
+  const [email, setEmail] = useState<string>('surisha@gmail.com');
+  const [password, setPassword] = useState<string>('Surisha#3210');
   const [loading, setLoading] = useState<boolean>(false);
 
   const handleLogin = async () => {
     if (!email || !password) {
-      Alert.alert("Validation Error", "Please enter email and password");
+      Alert.alert('Validation Error', 'Please enter email and password');
       return;
     }
-
+    console.log('Attempting login with:', { email, password });
     setLoading(true);
 
     try {
+      console.log('API Urls', API_URLS);
+
       const res = await PatientApi.post(API_URLS.PATIENT_LOGIN, {
         email,
         password,
       });
 
-      // Store Token Securely
-      await AsyncStorage.setItem("patientToken", res.data.token);
-      await AsyncStorage.setItem("isPatientLoggedIn", "true");
+      console.log('Login Response', res);
+      if (res?.status !== 200) {
+        Alert.alert('Login Failed', 'Invalid email or password');
+      } else {
+        // Store Token Securely
+        await AsyncStorage.setItem('patientToken', res.data.token);
+        await AsyncStorage.setItem('isPatientLoggedIn', 'true');
 
-      Alert.alert("Login Successful");
+        // Alert.alert('Login Successful');
 
-      // Navigate After Login
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "Main" }],
-      });
-      
+        // Navigate After Login
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Main' }],
+        });
+      }
     } catch (err: any) {
       console.error(err);
       Alert.alert(
-        "Login Failed",
-        err.response?.data?.message || "Invalid email or password"
+        'Login Failed',
+        err.response?.data?.message || 'Invalid email or password',
       );
     } finally {
       setLoading(false);
@@ -61,11 +75,19 @@ const PatientLogin: React.FC = () => {
   return (
     <View style={styles.overlay}>
       <View style={styles.card}>
+<<<<<<< HEAD
  <Image
   source={require("../assets/PUKRA-Logo.png")}
   style={styles.logo}
   resizeMode="contain"
 />
+=======
+        <Image
+          source={require('../assets/PUKRA-Hospial Logo-enggg.png')}
+          style={styles.logo}
+          resizeMode="contain"
+        />
+>>>>>>> 49be0b43cc69b6855ef8cc21d57304c6f6261bd2
         <Text style={styles.title}>Patient Login</Text>
 
         {/* EMAIL */}
@@ -108,9 +130,9 @@ const PatientLogin: React.FC = () => {
           Create a new account?
           <Text
             style={styles.registerBtn}
-            onPress={() => navigation.navigate("Register")}
+            onPress={() => navigation.navigate('Register')}
           >
-            {" "}
+            {' '}
             Register
           </Text>
         </Text>
@@ -126,14 +148,14 @@ export default PatientLogin;
 const styles = StyleSheet.create({
   overlay: {
     flex: 1,
-    backgroundColor: "rgba(0,0,0,0.6)",
-    justifyContent: "center",
-    alignItems: "center",
+    backgroundColor: 'rgba(0,0,0,0.6)',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 
   card: {
-    backgroundColor: "#fff",
-    width: "90%",
+    backgroundColor: '#fff',
+    width: '90%',
     padding: 24,
     borderRadius: 14,
     elevation: 10,
@@ -141,27 +163,40 @@ const styles = StyleSheet.create({
 
   title: {
     fontSize: 23,
+<<<<<<< HEAD
     fontWeight: "bold",
     textAlign: "center",
     marginBottom: 25,
+=======
+    fontWeight: 'bold',
+    textAlign: 'center',
+    marginBottom: 25,
+  },
+
+  logo: {
+    width: 120,
+    height: 120,
+    alignSelf: 'center',
+    // marginBottom: 2,
+>>>>>>> 49be0b43cc69b6855ef8cc21d57304c6f6261bd2
   },
 
   input: {
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: '#ccc',
     borderRadius: 8,
     padding: 12,
     marginBottom: 12,
   },
 
   button: {
-    backgroundColor: "#1D5D9B",
+    backgroundColor: '#1D5D9B',
     paddingVertical: 12,
     borderRadius: 8,
-    alignItems: "center",
+    alignItems: 'center',
     marginTop: 8,
-    flexDirection: "row",
-    justifyContent: "center",
+    flexDirection: 'row',
+    justifyContent: 'center',
     gap: 6,
   },
 
@@ -170,21 +205,21 @@ const styles = StyleSheet.create({
   },
 
   btnText: {
-    color: "#fff",
-    fontWeight: "bold",
+    color: '#fff',
+    fontWeight: 'bold',
     fontSize: 16,
   },
 
   registerText: {
-    textAlign: "center",
+    textAlign: 'center',
     marginTop: 14,
     fontSize: 13,
-    color: "#333",
+    color: '#333',
   },
 
   registerBtn: {
-    color: "#2563EB",
-    fontWeight: "600",
+    color: '#2563EB',
+    fontWeight: '600',
   },
    logo: {
     width: 120,
