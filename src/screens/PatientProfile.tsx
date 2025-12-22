@@ -13,7 +13,7 @@ import {
 import Icon from 'react-native-vector-icons/Feather';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { useNavigation } from '@react-navigation/native';
-import IonIcon from 'react-native-vector-icons/Ionicons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import PatientApi from '../utils/Patient_Api';
 import API_URLS from '../config/API_URLS';
 
@@ -54,8 +54,6 @@ const PatientProfile: React.FC = () => {
     image: null,
     preview: null,
   });
-
-  const [originalUser, setOriginalUser] = useState<User | null>(null);
 
   const [passwords, setPasswords] = useState<Passwords>({
     oldPassword: '',
@@ -158,7 +156,6 @@ const PatientProfile: React.FC = () => {
       });
 
       setIsEditing(false);
-      setOriginalUser(null);
       Alert.alert('Success', 'Profile updated successfully');
     } catch (err: any) {
       Alert.alert('Error', err.response?.data?.message || 'Update failed');
@@ -192,6 +189,26 @@ const PatientProfile: React.FC = () => {
     }
   };
 
+  // Logout
+  const handleLogout = async () => {
+    try {
+      await PatientApi.post(API_URLS.PATIENT_LOGOUT);
+      await AsyncStorage.removeItem('patientToken');
+      await AsyncStorage.removeItem('isPatientLoggedIn');
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Login' }],
+      });
+    } catch (err) {
+      console.error('Logout failed', err);
+      await AsyncStorage.removeItem('patientToken');
+      navigation.reset({
+        index: 0,
+        routes: [{ name: 'Login' }],
+      });
+    }
+  };
+
   // Page Loader
   if (pageLoading) {
     return (
@@ -203,6 +220,7 @@ const PatientProfile: React.FC = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
+      {/* Header */}
       <View style={styles.header}>
         <TouchableOpacity
           onPress={() => navigation.goBack()}
@@ -212,6 +230,7 @@ const PatientProfile: React.FC = () => {
         </TouchableOpacity>
         <Text style={styles.headerTitle}>Patient Profile</Text>
       </View>
+
       {/* Avatar */}
       <TouchableOpacity onPress={handleImagePick} style={styles.avatarBox}>
         {user.preview ? (
@@ -234,13 +253,11 @@ const PatientProfile: React.FC = () => {
         style={styles.input}
         placeholder="Full Name"
       />
-
       <TextInput
         value={user.email}
         editable={false}
         style={styles.inputDisabled}
       />
-
       <TextInput
         value={user.phone}
         editable={isEditing}
@@ -248,7 +265,6 @@ const PatientProfile: React.FC = () => {
         style={styles.input}
         placeholder="Phone"
       />
-
       <TextInput
         value={user.dob}
         editable={isEditing}
@@ -256,7 +272,6 @@ const PatientProfile: React.FC = () => {
         style={styles.input}
         placeholder="DOB (YYYY-MM-DD)"
       />
-
       <TextInput
         value={user.gender}
         editable={isEditing}
@@ -264,7 +279,6 @@ const PatientProfile: React.FC = () => {
         style={styles.input}
         placeholder="Gender"
       />
-
       <TextInput
         value={user.place}
         editable={isEditing}
@@ -272,7 +286,6 @@ const PatientProfile: React.FC = () => {
         style={styles.input}
         placeholder="Place"
       />
-
       <TextInput
         value={user.address}
         editable={isEditing}
@@ -297,16 +310,12 @@ const PatientProfile: React.FC = () => {
       ) : (
         <TouchableOpacity
           style={styles.editBtn}
-          onPress={() => {
-            setOriginalUser({ ...user });
-            setIsEditing(true);
-          }}
+          onPress={() => setIsEditing(true)}
         >
           <Text style={styles.btnText}>Edit Profile</Text>
         </TouchableOpacity>
       )}
 
-      {/* Change Password */}
       {!showPasswordForm && (
         <TouchableOpacity
           style={styles.passwordBtn}
@@ -316,11 +325,7 @@ const PatientProfile: React.FC = () => {
         </TouchableOpacity>
       )}
 
-      {/* Logout Button */}
-      <TouchableOpacity
-        style={styles.passwordBtn}
-        onPress={() => navigation.navigate('Login')}
-      >
+      <TouchableOpacity style={styles.passwordBtn} onPress={handleLogout}>
         <Text style={styles.btnText}>Log Out</Text>
       </TouchableOpacity>
 
@@ -364,28 +369,9 @@ export default PatientProfile;
 const styles = StyleSheet.create({
   container: { padding: 20, backgroundColor: '#fff' },
   loader: { flex: 1, justifyContent: 'center', alignItems: 'center' },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-
-  backBtn: {
-    marginRight: 12,
-  },
-
-  headerTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#606C32',
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: '700',
-    cursor: 'pointer',
-    textAlign: 'center',
-    marginBottom: 20,
-  },
+  header: { flexDirection: 'row', alignItems: 'center', marginBottom: 20 },
+  backBtn: { marginRight: 12 },
+  headerTitle: { fontSize: 24, fontWeight: '700', color: '#606C32' },
   avatarBox: { alignSelf: 'center', marginBottom: 16 },
   avatar: { width: 120, height: 120, borderRadius: 60 },
   avatarFallback: {
