@@ -17,8 +17,8 @@ import API_URLS from '../config/API_URLS';
 const PatientLogin: React.FC = () => {
   const navigation = useNavigation<any>();
 
-  const [email, setEmail] = useState<string>('');
-  const [password, setPassword] = useState<string>('');
+  const [email, setEmail] = useState<string>('surisha@gmail.com');
+  const [password, setPassword] = useState<string>('Surisha#3210');
   const [loading, setLoading] = useState<boolean>(false);
 
   const handleLogin = async () => {
@@ -26,26 +26,33 @@ const PatientLogin: React.FC = () => {
       Alert.alert('Validation Error', 'Please enter email and password');
       return;
     }
-
+    console.log('Attempting login with:', { email, password });
     setLoading(true);
 
     try {
+      console.log('API Urls', API_URLS);
+
       const res = await PatientApi.post(API_URLS.PATIENT_LOGIN, {
         email,
         password,
       });
 
-      // Store Token Securely
-      await AsyncStorage.setItem('patientToken', res.data.token);
-      await AsyncStorage.setItem('isPatientLoggedIn', 'true');
+      console.log('Login Response', res);
+      if (res?.status !== 200) {
+        Alert.alert('Login Failed', 'Invalid email or password');
+      } else {
+        // Store Token Securely
+        await AsyncStorage.setItem('patientToken', res.data.token);
+        await AsyncStorage.setItem('isPatientLoggedIn', 'true');
 
-      Alert.alert('Login Successful');
+        // Alert.alert('Login Successful');
 
-      // Navigate After Login
-      navigation.reset({
-        index: 0,
-        routes: [{ name: 'Main' }],
-      });
+        // Navigate After Login
+        navigation.reset({
+          index: 0,
+          routes: [{ name: 'Main' }],
+        });
+      }
     } catch (err: any) {
       console.error(err);
       Alert.alert(
@@ -145,10 +152,10 @@ const styles = StyleSheet.create({
     marginBottom: 25,
   },
 
-   logo: {
+  logo: {
     width: 120,
     height: 120,
-    alignSelf: "center",
+    alignSelf: 'center',
     // marginBottom: 2,
   },
 

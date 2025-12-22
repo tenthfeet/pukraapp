@@ -15,7 +15,7 @@ import {
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { WebView } from 'react-native-webview';
-import emailjs from 'emailjs-com';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import Api from '../utils/Api';
 import API_URLS from '../config/API_URLS';
 
@@ -80,6 +80,8 @@ const Home: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
   const [btnLoading, setBtnLoading] = useState(false);
+  type PickerMode = 'date' | 'time' | null;
+  const [pickerMode, setPickerMode] = useState<PickerMode>(null);
 
   const [form, setForm] = useState({
     name: '',
@@ -178,33 +180,32 @@ const Home: React.FC = () => {
   /* APPOINTMENT */
 
   const submitAppointment = async () => {
+    if (!selectedDoctor) return;
+
+    if (!form.name || !form.email || !form.phone || !form.date || !form.time) {
+      Alert.alert('Validation', 'Please fill all required fields');
+      return;
+    }
+
     try {
       setBtnLoading(true);
+      console.log('Appointments form data', form);
 
-      const payload = {
-        doctor_name: selectedDoctor?.name,
+      var result = await Api.post(API_URLS.APPOINTMENTS, {
+        doctor_name: selectedDoctor.name,
         name: form.name,
         email: form.email,
         phone: form.phone,
-        date: form.date,
-        time: form.time,
+        date: form.date, // YYYY-MM-DD
+        time: form.time, // HH:mm ✅
         symptoms: form.symptoms,
         description: form.description,
-      };
-
-      await Api.post(API_URLS.APPOINTMENTS, payload);
-
-      // Send EmailJS
-      await emailjs.send(
-        'service_w1td76c', // ⚠️ your service id
-        'template_cs39cld', // ⚠️ your template id
-        payload,
-        '9IiQILbseS_yDnazv', // ⚠️ your public key
-      );
+      });
+      console.log('Appointments api result', result);
 
       Alert.alert(
-        'Success',
-        'Appointment submitted successfully! We will contact you soon.',
+        '✅ Appointment Booked',
+        'Our team will contact you shortly.',
       );
 
       setShowForm(false);
@@ -217,9 +218,9 @@ const Home: React.FC = () => {
         symptoms: '',
         description: '',
       });
-    } catch (err) {
-      console.log(err);
-      Alert.alert('Error', 'Failed to submit appointment');
+    } catch (err: any) {
+      console.log(err?.response?.data);
+      Alert.alert('❌ Failed', 'Please try again later');
     } finally {
       setBtnLoading(false);
     }
@@ -460,21 +461,47 @@ const Home: React.FC = () => {
               style={styles.input}
               onChangeText={t => setForm({ ...form, phone: t })}
             />
-
-            <TextInput
-              placeholder="Preferred Date (YYYY-MM-DD)"
-              value={form.date}
+            {/* DATE */}
+            <TouchableOpacity
               style={styles.input}
-              onChangeText={t => setForm({ ...form, date: t })}
-            />
+              onPress={() => setPickerMode('date')}
+            >
+              <Text>{form.date || 'Select Date'}</Text>
+            </TouchableOpacity>
 
-            <TextInput
-              placeholder="Time Slot"
-              value={form.time}
+            {/* TIME */}
+            <TouchableOpacity
               style={styles.input}
-              onChangeText={t => setForm({ ...form, time: t })}
-            />
+              onPress={() => setPickerMode('time')}
+            >
+              <Text>{form.time || 'Select Time'}</Text>
+            </TouchableOpacity>
 
+            {/* SINGLE PICKER – HOOK SAFE */}
+            {pickerMode && (
+              <DateTimePicker
+                value={new Date()}
+                mode={pickerMode}
+                is24Hour
+                display="default"
+                onChange={(event, selectedDate) => {
+                  setPickerMode(null);
+                  if (!selectedDate) return;
+
+                  if (pickerMode === 'date') {
+                    setForm({
+                      ...form,
+                      date: selectedDate.toISOString().split('T')[0],
+                    });
+                  } else {
+                    setForm({
+                      ...form,
+                      time: selectedDate.toTimeString().slice(0, 5),
+                    });
+                  }
+                }}
+              />
+            )}
             <TextInput
               placeholder="Symptoms"
               value={form.symptoms}
