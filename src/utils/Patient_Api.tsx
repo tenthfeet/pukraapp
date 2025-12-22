@@ -1,18 +1,18 @@
-import axios from "axios";
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import API_URLS from "../config/API_URLS";
+import axios from 'axios';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import API_URLS from '../config/API_URLS';
 
 const PatientApi = axios.create({
   baseURL: API_URLS.BASE_URL,
   headers: {
-    Accept: "application/json",
+    Accept: 'application/json',
   },
 });
 
 // Attach Token from AsyncStorage
 PatientApi.interceptors.request.use(
-  async (config) => {
-    const token = await AsyncStorage.getItem("patientToken");
+  async config => {
+    const token = await AsyncStorage.getItem('patientToken');
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
@@ -20,7 +20,7 @@ PatientApi.interceptors.request.use(
 
     return config;
   },
-  (error) => Promise.reject(error)
+  error => Promise.reject(error),
 );
 
 export default PatientApi;

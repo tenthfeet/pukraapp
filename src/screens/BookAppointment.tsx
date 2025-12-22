@@ -9,6 +9,8 @@ import {
   ActivityIndicator,
   Alert,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/Ionicons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Api from '../utils/Api';
 import API_URLS from '../config/API_URLS';
@@ -26,6 +28,7 @@ interface FormState {
 type PickerMode = 'date' | 'time' | null;
 
 const BookAppointment: React.FC = () => {
+  const navigation = useNavigation();
   const [btnLoading, setBtnLoading] = useState(false);
   const [pickerMode, setPickerMode] = useState<PickerMode>(null);
 
@@ -75,7 +78,7 @@ const BookAppointment: React.FC = () => {
 
       Alert.alert(
         '✅ Appointment Booked',
-        'Our team will contact you shortly.'
+        'Our team will contact you shortly.',
       );
 
       setFormData({
@@ -100,12 +103,18 @@ const BookAppointment: React.FC = () => {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.header}>
-        <Text style={styles.title}>Book Appointment</Text>
+        <View style={styles.headerTop}>
+          <TouchableOpacity onPress={() => navigation.goBack()}>
+            <Icon name="arrow-back" size={24} color="#606C32" />
+          </TouchableOpacity>
+
+          <Text style={styles.title}>Book Appointment</Text>
+        </View>
+
         <Text style={styles.subtitle}>
           Your easy Hospital Guide, All in One Place
         </Text>
       </View>
-
       <TextInput
         style={styles.input}
         placeholder="Patient Name"
@@ -157,15 +166,9 @@ const BookAppointment: React.FC = () => {
             if (!selectedDate) return;
 
             if (pickerMode === 'date') {
-              handleChange(
-                'date',
-                selectedDate.toISOString().split('T')[0]
-              );
+              handleChange('date', selectedDate.toISOString().split('T')[0]);
             } else {
-              handleChange(
-                'time',
-                selectedDate.toTimeString().slice(0, 5)
-              );
+              handleChange('time', selectedDate.toTimeString().slice(0, 5));
             }
           }}
         />
@@ -212,17 +215,26 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   header: {
-    marginBottom: 20,
+    marginBottom: 12,
   },
+
+  headerTop: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+
   title: {
-    fontSize: 26,
+    fontSize: 22,
     fontWeight: 'bold',
     color: '#606C32',
   },
+
   subtitle: {
-    fontSize: 14,
-    color: '#555',
     marginTop: 4,
+    marginLeft: 34,
+    fontSize: 13,
+    color: '#555',
   },
   input: {
     borderWidth: 1,

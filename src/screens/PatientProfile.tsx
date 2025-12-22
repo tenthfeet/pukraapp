@@ -13,6 +13,7 @@ import {
 import Icon from 'react-native-vector-icons/Feather';
 import { launchImageLibrary } from 'react-native-image-picker';
 import { useNavigation } from '@react-navigation/native';
+import IonIcon from 'react-native-vector-icons/Ionicons';
 import PatientApi from '../utils/Patient_Api';
 import API_URLS from '../config/API_URLS';
 
@@ -202,8 +203,15 @@ const PatientProfile: React.FC = () => {
 
   return (
     <ScrollView contentContainerStyle={styles.container}>
-      <Text style={styles.title}>Patient Profile</Text>
-
+      <View style={styles.header}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backBtn}
+        >
+          <Icon name="arrow-left" size={24} color="#606C32" />
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Patient Profile</Text>
+      </View>
       {/* Avatar */}
       <TouchableOpacity onPress={handleImagePick} style={styles.avatarBox}>
         {user.preview ? (
@@ -308,13 +316,13 @@ const PatientProfile: React.FC = () => {
         </TouchableOpacity>
       )}
 
-       {/* Logout Button */}
-        <TouchableOpacity
-          style={styles.passwordBtn}
-         onPress={() => navigation.navigate('Login')}
-        >
-          <Text style={styles.btnText}>Log Out</Text>
-        </TouchableOpacity>
+      {/* Logout Button */}
+      <TouchableOpacity
+        style={styles.passwordBtn}
+        onPress={() => navigation.navigate('Login')}
+      >
+        <Text style={styles.btnText}>Log Out</Text>
+      </TouchableOpacity>
 
       {showPasswordForm && (
         <>
@@ -356,6 +364,21 @@ export default PatientProfile;
 const styles = StyleSheet.create({
   container: { padding: 20, backgroundColor: '#fff' },
   loader: { flex: 1, justifyContent: 'center', alignItems: 'center' },
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+
+  backBtn: {
+    marginRight: 12,
+  },
+
+  headerTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#606C32',
+  },
   title: {
     fontSize: 24,
     fontWeight: '700',

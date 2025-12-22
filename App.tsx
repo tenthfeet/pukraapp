@@ -1,11 +1,11 @@
-import React from "react";
-import { NavigationContainer } from "@react-navigation/native";
-import { createNativeStackNavigator } from "@react-navigation/native-stack";
-import PatientLogin from "./src/screens/PatientLogin";
-import PatientRegister from "./src/screens/PatientRegister";
-import MainTabNavigator from "./src/components/MainTabNavigator";
-import PatientDashboard from "./src/screens/PatientDashboard";
-import LabResults from "./src/screens/LabResults";
+import React from 'react';
+import { NavigationContainer } from '@react-navigation/native';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import PatientLogin from './src/screens/PatientLogin';
+import PatientRegister from './src/screens/PatientRegister';
+import MainTabNavigator from './src/components/MainTabNavigator';
+import PatientDashboard from './src/screens/PatientDashboard';
+import LabResults from './src/screens/LabResults';
 
 export type RootStackParamList = {
   Login: undefined;

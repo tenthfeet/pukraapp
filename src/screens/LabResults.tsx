@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState } from 'react';
 import {
   View,
   Text,
@@ -8,35 +8,68 @@ import {
   StyleSheet,
   Linking,
   Alert,
-} from "react-native";
-import Icon from "react-native-vector-icons/MaterialCommunityIcons";
-import RNFS from "react-native-fs";
+} from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/MaterialCommunityIcons';
+import IonIcon from 'react-native-vector-icons/Ionicons';
+import RNFS from 'react-native-fs';
 
 // Type
 interface LabResult {
   id: number;
   name: string;
   date: string;
-  status: "Completed" | "Processing" | "Pending";
+  status: 'Completed' | 'Processing' | 'Pending';
   file?: string;
 }
 
 // Mock Data
 const RESULTS: LabResult[] = [
-  { id: 1, name: "Blood test reports", date: "2025-02-20", status: "Completed", file: "https://www.africau.edu/images/default/sample.pdf" },
-  { id: 2, name: "Scan reports (X-ray, MRI, CT)", date: "2025-02-18", status: "Processing" },
-  { id: 3, name: "Urine test results", date: "2025-02-10", status: "Pending" },
-  { id: 4, name: "Allergy test results", date: "2025-01-30", status: "Completed", file: "https://www.africau.edu/images/default/sample.pdf" },
-  { id: 5, name: "Thyroid function test", date: "2025-01-15", status: "Completed", file: "https://www.africau.edu/images/default/sample.pdf" }
+  {
+    id: 1,
+    name: 'Blood test reports',
+    date: '2025-02-20',
+    status: 'Completed',
+    file: 'https://www.africau.edu/images/default/sample.pdf',
+  },
+  {
+    id: 2,
+    name: 'Scan reports (X-ray, MRI, CT)',
+    date: '2025-02-18',
+    status: 'Processing',
+  },
+  {
+    id: 3,
+    name: 'Urine test results',
+    date: '2025-02-10',
+    status: 'Pending',
+  },
+  {
+    id: 4,
+    name: 'Allergy test results',
+    date: '2025-01-30',
+    status: 'Completed',
+    file: 'https://www.africau.edu/images/default/sample.pdf',
+  },
+  {
+    id: 5,
+    name: 'Thyroid function test',
+    date: '2025-01-15',
+    status: 'Completed',
+    file: 'https://www.africau.edu/images/default/sample.pdf',
+  },
 ];
 
 const LabResults: React.FC = () => {
-  const [search, setSearch] = useState("");
-  const [filter, setFilter] = useState("All");
+  const navigation = useNavigation();
+  const [search, setSearch] = useState('');
+  const [filter, setFilter] = useState('All');
 
   const filteredResults = RESULTS.filter(item => {
-    const matchesSearch = item.name.toLowerCase().includes(search.toLowerCase());
-    const matchesFilter = filter === "All" || item.status === filter;
+    const matchesSearch = item.name
+      .toLowerCase()
+      .includes(search.toLowerCase());
+    const matchesFilter = filter === 'All' || item.status === filter;
     return matchesSearch && matchesFilter;
   });
 
@@ -49,7 +82,8 @@ const LabResults: React.FC = () => {
   // Download PDF
   const handleDownload = async (url?: string) => {
     if (!url) return;
-    const fileName = url.split("/").pop();
+
+    const fileName = url.split('/').pop();
     const path = `${RNFS.DownloadDirectoryPath}/${fileName}`;
 
     try {
@@ -58,10 +92,10 @@ const LabResults: React.FC = () => {
         toFile: path,
       }).promise;
 
-      Alert.alert("✅ Downloaded to Downloads folder");
+      Alert.alert('✅ Downloaded', 'Saved to Downloads folder');
     } catch (err) {
       console.error(err);
-      Alert.alert("❌ Download failed");
+      Alert.alert('❌ Download failed');
     }
   };
 
@@ -73,9 +107,9 @@ const LabResults: React.FC = () => {
       <Text
         style={[
           styles.status,
-          item.status === "Completed"
+          item.status === 'Completed'
             ? styles.completed
-            : item.status === "Processing"
+            : item.status === 'Processing'
             ? styles.processing
             : styles.pending,
         ]}
@@ -109,7 +143,14 @@ const LabResults: React.FC = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>🧪 Lab Results</Text>
+      {/* HEADER */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <IonIcon name="arrow-back" size={24} color="#000" />
+        </TouchableOpacity>
+
+        <Text style={styles.headerTitle}>Lab Results</Text>
+      </View>
 
       {/* Search */}
       <TextInput
@@ -119,16 +160,13 @@ const LabResults: React.FC = () => {
         onChangeText={setSearch}
       />
 
-      {/* Filter Buttons */}
+      {/* Filter */}
       <View style={styles.filterRow}>
-        {["All", "Completed", "Pending"].map(item => (
+        {['All', 'Completed', 'Pending'].map(item => (
           <TouchableOpacity
             key={item}
             onPress={() => setFilter(item)}
-            style={[
-              styles.filterBtn,
-              filter === item && styles.activeFilter,
-            ]}
+            style={[styles.filterBtn, filter === item && styles.activeFilter]}
           >
             <Text
               style={[
@@ -145,7 +183,7 @@ const LabResults: React.FC = () => {
       {/* List */}
       <FlatList
         data={filteredResults}
-        keyExtractor={(item) => item.id.toString()}
+        keyExtractor={item => item.id.toString()}
         renderItem={renderItem}
         contentContainerStyle={{ paddingBottom: 20 }}
       />
@@ -163,116 +201,132 @@ export default LabResults;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: '#f9fafb',
     padding: 16,
-    backgroundColor: "#f9fafb",
   },
-  title: {
-    fontSize: 22,
-    fontWeight: "700",
+
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
     marginBottom: 12,
+    gap: 10,
   },
+  headerTitle: {
+    fontSize: 22,
+    fontWeight: '700',
+  },
+
   search: {
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: '#ccc',
     borderRadius: 8,
     padding: 10,
     marginBottom: 10,
   },
+
   filterRow: {
-    flexDirection: "row",
-    justifyContent: "space-around",
+    flexDirection: 'row',
+    justifyContent: 'space-around',
     marginBottom: 16,
   },
+
   filterBtn: {
     paddingVertical: 6,
     paddingHorizontal: 14,
     borderRadius: 20,
     borderWidth: 1,
-    borderColor: "#ccc",
+    borderColor: '#ccc',
   },
   activeFilter: {
-    backgroundColor: "#2563eb",
+    backgroundColor: '#2563eb',
   },
   filterText: {
     fontSize: 13,
-    color: "#000",
   },
   activeFilterText: {
-    color: "#fff",
+    color: '#fff',
   },
 
   card: {
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
     padding: 14,
     borderRadius: 12,
     marginBottom: 14,
     elevation: 2,
   },
+
   name: {
     fontSize: 16,
-    fontWeight: "700",
+    fontWeight: '700',
   },
   date: {
     marginTop: 4,
-    color: "#555",
+    color: '#555',
   },
+
   status: {
     marginTop: 8,
-    alignSelf: "flex-start",
+    alignSelf: 'flex-start',
     paddingVertical: 4,
     paddingHorizontal: 12,
     borderRadius: 20,
     fontSize: 12,
-    fontWeight: "600",
+    fontWeight: '600',
   },
+
   completed: {
-    color: "#166534",
-    borderColor: "#166534",
+    color: '#166534',
     borderWidth: 1,
+    borderColor: '#166534',
   },
   processing: {
-    color: "#a16207",
-    borderColor: "#a16207",
+    color: '#a16207',
     borderWidth: 1,
+    borderColor: '#a16207',
   },
   pending: {
-    color: "#991b1b",
-    borderColor: "#991b1b",
+    color: '#991b1b',
     borderWidth: 1,
+    borderColor: '#991b1b',
   },
 
   actions: {
-    flexDirection: "row",
+    flexDirection: 'row',
     gap: 12,
     marginTop: 12,
   },
+
   viewBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#2563eb",
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#2563eb',
     padding: 8,
     borderRadius: 6,
   },
+
   downloadBtn: {
-    flexDirection: "row",
-    alignItems: "center",
-    backgroundColor: "#16a34a",
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#16a34a',
     padding: 8,
     borderRadius: 6,
   },
+
   btnText: {
-    color: "#fff",
+    color: '#fff',
     fontSize: 13,
     marginLeft: 6,
   },
+
   notAvailable: {
     marginTop: 12,
-    color: "#6b7280",
-    fontStyle: "italic",
+    color: '#6b7280',
+    fontStyle: 'italic',
   },
+
   footer: {
     marginTop: 20,
-    textAlign: "center",
-    color: "#374151",
+    textAlign: 'center',
+    color: '#374151',
   },
 });

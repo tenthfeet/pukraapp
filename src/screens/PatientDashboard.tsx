@@ -1,10 +1,26 @@
-import React from "react";
-import { View, Text, StyleSheet } from "react-native";
+import React from 'react';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/Ionicons';
 
 const PatientDashboard: React.FC = () => {
+  const navigation = useNavigation();
+
   return (
     <View style={styles.container}>
-      <Text style={styles.heading}>Patient Dashboard</Text>
+      {/* HEADER WITH BACK BUTTON */}
+      <View style={styles.header}>
+        <TouchableOpacity
+          onPress={() => navigation.goBack()}
+          style={styles.backButton}
+        >
+          <Icon name="arrow-back" size={24} color="#333" />
+        </TouchableOpacity>
+
+        <Text style={styles.headerTitle}>Patient Dashboard</Text>
+      </View>
+
+      {/* CONTENT */}
       <Text style={styles.text}>
         Welcome to the patient dashboard! Here you can manage everything.
       </Text>
@@ -17,17 +33,29 @@ export default PatientDashboard;
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 16,
-    backgroundColor: "#fff",
+    backgroundColor: '#fff',
+    paddingTop: 10,
   },
-  heading: {
-    fontSize: 24,
-    fontWeight: "600",
-    marginBottom: 12,
-    color: "#333",
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  backButton: {
+    padding: 6,
+    marginRight: 8,
+  },
+  headerTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#333',
   },
   text: {
     fontSize: 16,
-    color: "#555",
+    color: '#555',
+    padding: 16,
   },
 });

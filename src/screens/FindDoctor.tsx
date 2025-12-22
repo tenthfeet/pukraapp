@@ -13,6 +13,8 @@ import {
   Alert,
   Dimensions,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import Icon from 'react-native-vector-icons/Ionicons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Api from '../utils/Api';
 import API_URLS from '../config/API_URLS';
@@ -27,6 +29,7 @@ interface Doctor {
 }
 
 const FindDoctor: React.FC = () => {
+  const navigation = useNavigation();
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [filteredDoctors, setFilteredDoctors] = useState<Doctor[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
@@ -174,7 +177,14 @@ const FindDoctor: React.FC = () => {
 
   return (
     <ScrollView style={styles.container}>
-      <Text style={styles.title}>Find a Doctor</Text>
+      {/* HEADER */}
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Icon name="arrow-back" size={24} color="#606C32" />
+        </TouchableOpacity>
+
+        <Text style={styles.title}>Find a Doctor</Text>
+      </View>
 
       <TextInput
         style={styles.search}
@@ -317,6 +327,13 @@ export default FindDoctor;
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F9FAFB', padding: 16 },
+
+  header: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+    marginBottom: 10,
+  },
 
   title: { fontSize: 26, fontWeight: 'bold', color: '#606C32' },
 
