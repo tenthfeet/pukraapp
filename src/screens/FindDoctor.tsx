@@ -186,12 +186,21 @@ const FindDoctor: React.FC = () => {
         <Text style={styles.title}>Find a Doctor</Text>
       </View>
 
-      <TextInput
-        style={styles.search}
-        placeholder="Search by name, degree or speciality"
-        value={searchTerm}
-        onChangeText={setSearchTerm}
-      />
+      <View style={styles.searchWrapper}>
+        <Icon
+          name="search"
+          size={20}
+          color="#888"
+          style={{ marginHorizontal: 8 }}
+        />
+        <TextInput
+          style={styles.searchInput}
+          placeholder="Search by name, degree or speciality"
+          placeholderTextColor="#888"
+          value={searchTerm}
+          onChangeText={setSearchTerm}
+        />
+      </View>
 
       {loading ? (
         <ActivityIndicator size="large" />
@@ -216,6 +225,7 @@ const FindDoctor: React.FC = () => {
 
             <TextInput
               placeholder="Patient Name"
+              placeholderTextColor="#888"
               style={styles.input}
               value={form.name}
               onChangeText={t => setForm({ ...form, name: t })}
@@ -223,6 +233,7 @@ const FindDoctor: React.FC = () => {
 
             <TextInput
               placeholder="Email"
+              placeholderTextColor="#888"
               style={styles.input}
               keyboardType="email-address"
               value={form.email}
@@ -231,6 +242,7 @@ const FindDoctor: React.FC = () => {
 
             <TextInput
               placeholder="Phone"
+              placeholderTextColor="#888"
               style={styles.input}
               keyboardType="phone-pad"
               value={form.phone}
@@ -239,10 +251,15 @@ const FindDoctor: React.FC = () => {
 
             {/* DATE */}
             <TouchableOpacity
-              style={styles.input}
+              style={styles.iconInput}
               onPress={() => setShowDatePicker(true)}
             >
-              <Text>{form.date || 'Select Date'}</Text>
+              <Text
+                style={[styles.inputText, !form.date && styles.placeholderText]}
+              >
+                {form.date || 'Select Date'}
+              </Text>
+              <Icon name="calendar-outline" size={20} color="#606C32" />
             </TouchableOpacity>
 
             {showDatePicker && (
@@ -263,10 +280,15 @@ const FindDoctor: React.FC = () => {
 
             {/* TIME */}
             <TouchableOpacity
-              style={styles.input}
+              style={styles.iconInput}
               onPress={() => setShowTimePicker(true)}
             >
-              <Text>{form.time || 'Select Time'}</Text>
+              <Text
+                style={[styles.inputText, !form.time && styles.placeholderText]}
+              >
+                {form.time || 'Select Time'}
+              </Text>
+              <Icon name="time-outline" size={20} color="#606C32" />
             </TouchableOpacity>
 
             {showTimePicker && (
@@ -288,6 +310,7 @@ const FindDoctor: React.FC = () => {
 
             <TextInput
               placeholder="Symptoms"
+              placeholderTextColor="#888"
               style={styles.input}
               value={form.symptoms}
               onChangeText={t => setForm({ ...form, symptoms: t })}
@@ -295,6 +318,7 @@ const FindDoctor: React.FC = () => {
 
             <TextInput
               placeholder="Description"
+              placeholderTextColor="#888"
               multiline
               style={[styles.input, { height: 90 }]}
               value={form.description}
@@ -337,12 +361,22 @@ const styles = StyleSheet.create({
 
   title: { fontSize: 26, fontWeight: 'bold', color: '#606C32' },
 
-  search: {
+  searchWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 10,
-    padding: 10,
+    backgroundColor: '#fff',
     marginVertical: 10,
+    paddingHorizontal: 8,
+  },
+
+  searchInput: {
+    flex: 1,
+    height: 40,
+    color: '#000', // typed text color
+    fontSize: 16,
   },
 
   card: {
@@ -399,6 +433,30 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 8,
     marginVertical: 6,
+    backgroundColor: '#fff',
+    color: '#000',
+  },
+
+  iconInput: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    width: '100%',
+    padding: 10,
+    borderRadius: 8,
+    marginVertical: 6,
+    backgroundColor: '#fff',
+  },
+
+  inputText: {
+    fontSize: 16,
+    color: '#000',
+  },
+
+  placeholderText: {
+    color: '#888',
   },
 
   mainBtn: {

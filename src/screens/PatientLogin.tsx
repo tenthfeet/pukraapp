@@ -9,6 +9,7 @@ import {
   Alert,
   Image,
 } from 'react-native';
+import Icon from 'react-native-vector-icons/Feather';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import PatientApi from '../utils/Patient_Api';
@@ -17,9 +18,10 @@ import API_URLS from '../config/API_URLS';
 const PatientLogin: React.FC = () => {
   const navigation = useNavigation<any>();
 
-  const [email, setEmail] = useState<string>('surisha@gmail.com');
-  const [password, setPassword] = useState<string>('Surisha#3210');
+  const [email, setEmail] = useState<string>('');
+  const [password, setPassword] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -72,26 +74,40 @@ const PatientLogin: React.FC = () => {
           style={styles.logo}
           resizeMode="contain"
         />
-        <Text style={styles.title}>Patient Login</Text>
+        <Text style={styles.title}>LOGIN</Text>
 
         {/* EMAIL */}
         <TextInput
           placeholder="Email"
+          placeholderTextColor="#777"
           keyboardType="email-address"
           autoCapitalize="none"
+          underlineColorAndroid="transparent"
           style={styles.input}
           value={email}
           onChangeText={setEmail}
         />
 
         {/* PASSWORD */}
-        <TextInput
-          placeholder="Password"
-          secureTextEntry
-          style={styles.input}
-          value={password}
-          onChangeText={setPassword}
-        />
+        <View style={styles.passwordContainer}>
+          <TextInput
+            placeholder="Password"
+            placeholderTextColor="#777"
+            secureTextEntry={!showPassword}
+            underlineColorAndroid="transparent"
+            style={styles.passwordInput}
+            value={password}
+            onChangeText={setPassword}
+          />
+
+          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+            <Icon
+              name={showPassword ? 'eye-off' : 'eye'}
+              size={20}
+              color="#555"
+            />
+          </TouchableOpacity>
+        </View>
 
         {/* LOGIN BUTTON */}
         <TouchableOpacity
@@ -127,7 +143,7 @@ const PatientLogin: React.FC = () => {
 
 export default PatientLogin;
 
-/* ================= STYLES ================= */
+/* STYLES */
 
 const styles = StyleSheet.create({
   overlay: {
@@ -149,12 +165,13 @@ const styles = StyleSheet.create({
     fontSize: 23,
     fontWeight: 'bold',
     textAlign: 'center',
-    marginBottom: 25,
+    marginBottom: 18,
+    color: '#606C32',
   },
 
   logo: {
-    width: 120,
-    height: 120,
+    width: 200,
+    height: 200,
     alignSelf: 'center',
     // marginBottom: 2,
   },
@@ -165,10 +182,27 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     marginBottom: 12,
+    color: '#000', 
+  },
+
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    marginBottom: 12,
+  },
+
+  passwordInput: {
+    flex: 1,
+    paddingVertical: 12,
+    color: '#000', // TEXT COLOR BLACK
   },
 
   button: {
-    backgroundColor: '#1D5D9B',
+    backgroundColor: '#606C32',
     paddingVertical: 12,
     borderRadius: 8,
     alignItems: 'center',
@@ -196,7 +230,7 @@ const styles = StyleSheet.create({
   },
 
   registerBtn: {
-    color: '#2563EB',
+    color: '#606C32',
     fontWeight: '600',
   },
 });

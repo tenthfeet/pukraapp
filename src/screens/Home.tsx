@@ -13,6 +13,7 @@ import {
   ScrollView,
   Alert,
 } from 'react-native';
+import Icon from 'react-native-vector-icons/Ionicons';
 import { useNavigation } from '@react-navigation/native';
 import { WebView } from 'react-native-webview';
 import DateTimePicker from '@react-native-community/datetimepicker';
@@ -287,21 +288,35 @@ const Home: React.FC = () => {
 
       {/* HERO TEXT */}
       <View style={styles.heroBox}>
-        <Text style={styles.heroTag}>Trusted Care for Healthier Tomorrow</Text>
         <Text style={styles.heroTitle}>
-          Your Health is {'\n'}
-          <Text style={{ color: '#606C32' }}>Our Priority! {'\n'} </Text>
-          <Text style={{ fontSize: 16, lineHeight: 22, color: '#333' }}>
-            Pukra is a state-of-the-art super-speciality hospital established
-            under the esteemed <Text>Kovai Heart Foundation</Text> - a trusted
-            name in cardiac care since 2009. With 16 years of excellence, Pukra
-            delivers holistic, world-class healthcare with a patient-centric
-            approach. Guided by <Text>Dr. Rajendran's</Text> visionary
-            leadership, the foundation expanded across multiple specialties. A
-            notable milestone includes the pioneering of a{' '}
-            <Text>15-minute angiography</Text> procedure - promoted with the
-            tagline <Text>"Walk-in & Walk-out"</Text> - benefiting over 1 lakh
-            patients.
+          Advanced Multi Speciality Care, {'\n'}
+          <Text style={{ color: '#606C32' }}>
+            When Every Second Matters {'\n'}
+          </Text>
+          <Text style={styles.heroTag}>
+            With dedicated Cardiology, Gynecology, Orthopedics, Urology,
+            Pediatric and 24×7 Emergency units, PUKRA delivers fast, accurate
+            and compassionate treatment in Coimbatore.{'\n'}
+          </Text>
+          <Text style={{ fontSize: 16, lineHeight: 22, marginTop: 10, color: '#333' }}>
+           PUKRA Super Speciality Hospital is a modern multi disciplinary
+                centre in Irugur, Coimbatore, bringing advanced tertiary care
+                closer to families in the region. Evolving from the trusted
+                legacy of Kovai Heart Foundation, the hospital now offers
+                comprehensive Cardiology, Gynecology, Orthopedics, Emergency,
+                Urology, Pediatric and many more services under one roof.
+               {'\n'}
+                A dedicated team of experienced consultants, surgeons,
+                intensivists and nurses work in coordination to deliver timely,
+                ethical and affordable treatment for every patient. With world
+                class critical care units, operation theatres, diagnostics and
+                child friendly spaces.
+                {'\n'}
+                PUKRA is equipped to handle everything from routine check ups to
+                complex emergencies. Backed by more than 18 years of continuous
+                service in Coimbatore, the hospital is committed to transparent
+                communication, compassionate care and clinical outcomes that
+                families can trust.
           </Text>
         </Text>
 
@@ -443,6 +458,7 @@ const Home: React.FC = () => {
             {/* INPUTS */}
             <TextInput
               placeholder="Patient Name"
+              placeholderTextColor="#888"
               value={form.name}
               style={styles.input}
               onChangeText={t => setForm({ ...form, name: t })}
@@ -450,6 +466,7 @@ const Home: React.FC = () => {
 
             <TextInput
               placeholder="Email"
+              placeholderTextColor="#888"
               value={form.email}
               style={styles.input}
               onChangeText={t => setForm({ ...form, email: t })}
@@ -457,24 +474,37 @@ const Home: React.FC = () => {
 
             <TextInput
               placeholder="Phone"
+              placeholderTextColor="#888"
               value={form.phone}
               style={styles.input}
               onChangeText={t => setForm({ ...form, phone: t })}
             />
             {/* DATE */}
             <TouchableOpacity
-              style={styles.input}
+              style={styles.iconInput}
               onPress={() => setPickerMode('date')}
             >
-              <Text>{form.date || 'Select Date'}</Text>
+              <Text
+                style={[styles.inputText, !form.date && styles.placeholderText]}
+              >
+                {form.date || 'Select Date'}
+              </Text>
+
+              <Icon name="calendar-outline" size={20} color="#606C32" />
             </TouchableOpacity>
 
             {/* TIME */}
             <TouchableOpacity
-              style={styles.input}
+              style={styles.iconInput}
               onPress={() => setPickerMode('time')}
             >
-              <Text>{form.time || 'Select Time'}</Text>
+              <Text
+                style={[styles.inputText, !form.time && styles.placeholderText]}
+              >
+                {form.time || 'Select Time'}
+              </Text>
+
+              <Icon name="time-outline" size={20} color="#606C32" />
             </TouchableOpacity>
 
             {/* SINGLE PICKER – HOOK SAFE */}
@@ -504,6 +534,7 @@ const Home: React.FC = () => {
             )}
             <TextInput
               placeholder="Symptoms"
+              placeholderTextColor="#888"
               value={form.symptoms}
               style={styles.input}
               onChangeText={t => setForm({ ...form, symptoms: t })}
@@ -511,6 +542,7 @@ const Home: React.FC = () => {
 
             <TextInput
               placeholder="Description"
+              placeholderTextColor="#888"
               value={form.description}
               style={[styles.input, { height: 80 }]}
               multiline
@@ -552,7 +584,7 @@ const styles = StyleSheet.create({
   slideImg: { width, height: 260 },
 
   heroBox: { padding: 16 },
-  heroTag: { color: '#2563EB' },
+  heroTag: { color: '#2563EB', fontSize: 16, lineHeight: 22 },
   heroTitle: { fontSize: 26, fontWeight: 'bold', marginVertical: 8 },
 
   heroBtn: {
@@ -722,7 +754,7 @@ const styles = StyleSheet.create({
 
   blueCard: {
     flex: 1,
-    backgroundColor: '#1556d6',
+    backgroundColor: '#606C32',
     margin: 8,
     padding: 16,
     borderRadius: 16,
@@ -752,6 +784,29 @@ const styles = StyleSheet.create({
     marginVertical: 6,
     padding: 10,
     borderRadius: 8,
+    backgroundColor: '#fff',
+    color: '#000',
+  },
+
+  iconInput: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    marginVertical: 6,
+    padding: 10,
+    borderRadius: 8,
+    backgroundColor: '#fff',
+  },
+
+  inputText: {
+    fontSize: 16,
+    color: '#000',
+  },
+
+  placeholderText: {
+    color: '#888',
   },
 
   submitBtn: {

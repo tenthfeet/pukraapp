@@ -11,7 +11,9 @@ import {
   Alert,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
+import DateTimePicker from '@react-native-community/datetimepicker';
 import { launchImageLibrary } from 'react-native-image-picker';
+import { Picker } from '@react-native-picker/picker';
 import { useNavigation } from '@react-navigation/native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import PatientApi from '../utils/Patient_Api';
@@ -35,13 +37,18 @@ interface Passwords {
   newPassword: string;
   confirmPassword: string;
 }
+type PickerMode = 'date' | null;
 
 const PatientProfile: React.FC = () => {
   const navigation = useNavigation<any>();
+  const [pickerMode, setPickerMode] = useState<PickerMode>(null);
   const [pageLoading, setPageLoading] = useState(true);
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(false);
   const [showPasswordForm, setShowPasswordForm] = useState(false);
+  const [showOldPassword, setShowOldPassword] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const [user, setUser] = useState<User>({
     name: '',
@@ -60,6 +67,12 @@ const PatientProfile: React.FC = () => {
     newPassword: '',
     confirmPassword: '',
   });
+
+  const formatDate = (dateStr: string) => {
+    if (!dateStr) return '';
+    const date = new Date(dateStr);
+    return date.toLocaleDateString('en-GB');
+  };
 
   // Helper: Replace localhost with BASE_URL
   const fixUrl = (url: string | null) => {
@@ -238,7 +251,7 @@ const PatientProfile: React.FC = () => {
         ) : (
           <View style={styles.avatarFallback}>
             <Text style={styles.avatarText}>
-              {user.name.charAt(0)?.toUpperCase()}
+              {user.name ? user.name.charAt(0).toUpperCase() : '?'}
             </Text>
           </View>
         )}
@@ -252,11 +265,14 @@ const PatientProfile: React.FC = () => {
         onChangeText={v => handleInputChange('name', v)}
         style={styles.input}
         placeholder="Full Name"
+        placeholderTextColor="#888"
       />
       <TextInput
         value={user.email}
         editable={false}
         style={styles.inputDisabled}
+        placeholder="Email"
+        placeholderTextColor="#888"
       />
       <TextInput
         value={user.phone}
@@ -264,27 +280,64 @@ const PatientProfile: React.FC = () => {
         onChangeText={v => handleInputChange('phone', v)}
         style={styles.input}
         placeholder="Phone"
+        placeholderTextColor="#888"
       />
-      <TextInput
-        value={user.dob}
-        editable={isEditing}
-        onChangeText={v => handleInputChange('dob', v)}
-        style={styles.input}
-        placeholder="DOB (YYYY-MM-DD)"
-      />
-      <TextInput
-        value={user.gender}
-        editable={isEditing}
-        onChangeText={v => handleInputChange('gender', v)}
-        style={styles.input}
-        placeholder="Gender"
-      />
+      {/* DOB Field */}
+      <TouchableOpacity
+        style={styles.inputIconWrapper}
+        onPress={() => isEditing && setPickerMode('date')} // only editable in edit mode
+      >
+        <Icon name="calendar" size={20} color="#888" style={styles.inputIcon} />
+        <Text
+          style={{ color: user.dob ? '#000' : '#888', fontSize: 16, flex: 1 }}
+        >
+          {user.dob ? formatDate(user.dob) : 'Select DOB'}
+        </Text>
+      </TouchableOpacity>
+
+      {/* Single Date Picker */}
+      {pickerMode && (
+        <DateTimePicker
+          value={user.dob ? new Date(user.dob) : new Date()}
+          mode="date"
+          display="default"
+          maximumDate={new Date()}
+          onChange={(event, selectedDate) => {
+            setPickerMode(null);
+            if (event.type === 'set' && selectedDate) {
+              const formatted = selectedDate.toISOString().split('T')[0]; // YYYY-MM-DD
+              handleInputChange('dob', formatted);
+            }
+          }}
+        />
+      )}
+      {/* Gender Picker */}
+      <View style={[styles.input, { justifyContent: 'center' }]}>
+        {isEditing ? (
+          <Picker
+            selectedValue={user.gender}
+            onValueChange={value => handleInputChange('gender', value)}
+            mode="dropdown"
+            style={{ color: '#000', width: '100%' }}
+          >
+            <Picker.Item label="Select Gender" value="" />
+            <Picker.Item label="Male" value="Male" />
+            <Picker.Item label="Female" value="Female" />
+            <Picker.Item label="Others" value="Others" />
+          </Picker>
+        ) : (
+          <Text style={{ fontSize: 16, color: '#000' }}>
+            {user.gender || '-'}
+          </Text>
+        )}
+      </View>
       <TextInput
         value={user.place}
         editable={isEditing}
         onChangeText={v => handleInputChange('place', v)}
         style={styles.input}
         placeholder="Place"
+        placeholderTextColor="#888"
       />
       <TextInput
         value={user.address}
@@ -292,21 +345,55 @@ const PatientProfile: React.FC = () => {
         onChangeText={v => handleInputChange('address', v)}
         style={styles.textArea}
         placeholder="Address"
+        placeholderTextColor="#888"
         multiline
       />
 
       {/* Buttons */}
       {isEditing ? (
-        <TouchableOpacity
-          style={styles.updateBtn}
-          onPress={handleProfileUpdate}
-        >
-          {loading ? (
-            <ActivityIndicator color="#fff" />
-          ) : (
-            <Text style={styles.btnText}>Update Profile</Text>
-          )}
-        </TouchableOpacity>
+        <View style={{ flexDirection: 'row', justifyContent: 'space-between' }}>
+          {/* Update Button */}
+          <TouchableOpacity
+            style={[styles.updateBtn, { flex: 1, marginRight: 8 }]}
+            onPress={handleProfileUpdate}
+          >
+            {loading ? (
+              <ActivityIndicator color="#fff" />
+            ) : (
+              <Text style={styles.btnText}>Update Profile</Text>
+            )}
+          </TouchableOpacity>
+
+          {/* Cancel Button */}
+          <TouchableOpacity
+            style={[styles.cancelBtn, { flex: 1 }]}
+            onPress={() => {
+              // Reset user state to last fetched profile
+              setIsEditing(false);
+              setPageLoading(true);
+              PatientApi.get(API_URLS.PATIENT_PROFILE)
+                .then(({ data }) => {
+                  const imageUrl = fixUrl(
+                    data.photo?.original_url || data.image || null,
+                  );
+                  setUser({
+                    name: data.name || '',
+                    email: data.email || '',
+                    phone: data.phone || '',
+                    dob: data.dob || '',
+                    gender: data.gender || '',
+                    address: data.address || '',
+                    place: data.place || '',
+                    image: null,
+                    preview: imageUrl,
+                  });
+                })
+                .finally(() => setPageLoading(false));
+            }}
+          >
+            <Text style={styles.btnText}>Cancel</Text>
+          </TouchableOpacity>
+        </View>
       ) : (
         <TouchableOpacity
           style={styles.editBtn}
@@ -330,35 +417,84 @@ const PatientProfile: React.FC = () => {
       </TouchableOpacity>
 
       {showPasswordForm && (
-        <>
-          <TextInput
-            placeholder="Old Password"
-            secureTextEntry
-            style={styles.input}
-            onChangeText={v => setPasswords({ ...passwords, oldPassword: v })}
-          />
-          <TextInput
-            placeholder="New Password"
-            secureTextEntry
-            style={styles.input}
-            onChangeText={v => setPasswords({ ...passwords, newPassword: v })}
-          />
-          <TextInput
-            placeholder="Confirm Password"
-            secureTextEntry
-            style={styles.input}
-            onChangeText={v =>
-              setPasswords({ ...passwords, confirmPassword: v })
-            }
-          />
+        <View style={styles.passwordForm}>
+          <View style={styles.passwordHeader}>
+            <Text style={styles.sectionTitle}>Change Password</Text>
+            <TouchableOpacity onPress={() => setShowPasswordForm(false)}>
+              <Icon name="x" size={24} color="#dc2626" />
+            </TouchableOpacity>
+          </View>
 
+          {/* Old Password */}
+          <View style={styles.passwordField}>
+            <TextInput
+              placeholder="Old Password"
+              placeholderTextColor="#888"
+              secureTextEntry={!showOldPassword}
+              style={styles.inputWithIconPassword}
+              onChangeText={v => setPasswords({ ...passwords, oldPassword: v })}
+            />
+            <TouchableOpacity
+              onPress={() => setShowOldPassword(!showOldPassword)}
+            >
+              <Icon
+                name={showOldPassword ? 'eye-off' : 'eye'}
+                size={20}
+                color="#888"
+              />
+            </TouchableOpacity>
+          </View>
+
+          {/* New Password */}
+          <View style={styles.passwordField}>
+            <TextInput
+              placeholder="New Password"
+              placeholderTextColor="#888"
+              secureTextEntry={!showNewPassword}
+              style={styles.inputWithIconPassword}
+              onChangeText={v => setPasswords({ ...passwords, newPassword: v })}
+            />
+            <TouchableOpacity
+              onPress={() => setShowNewPassword(!showNewPassword)}
+            >
+              <Icon
+                name={showNewPassword ? 'eye-off' : 'eye'}
+                size={20}
+                color="#888"
+              />
+            </TouchableOpacity>
+          </View>
+
+          {/* Confirm Password */}
+          <View style={styles.passwordField}>
+            <TextInput
+              placeholder="Confirm Password"
+              placeholderTextColor="#888"
+              secureTextEntry={!showConfirmPassword}
+              style={styles.inputWithIconPassword}
+              onChangeText={v =>
+                setPasswords({ ...passwords, confirmPassword: v })
+              }
+            />
+            <TouchableOpacity
+              onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+            >
+              <Icon
+                name={showConfirmPassword ? 'eye-off' : 'eye'}
+                size={20}
+                color="#888"
+              />
+            </TouchableOpacity>
+          </View>
+
+          {/* Update Password Button */}
           <TouchableOpacity
             style={styles.updateBtn}
             onPress={handlePasswordUpdate}
           >
             <Text style={styles.btnText}>Update Password</Text>
           </TouchableOpacity>
-        </>
+        </View>
       )}
     </ScrollView>
   );
@@ -391,12 +527,23 @@ const styles = StyleSheet.create({
     padding: 6,
     borderRadius: 20,
   },
+  cancelBtn: {
+    backgroundColor: '#dc2626',
+    padding: 14,
+    borderRadius: 8,
+    marginBottom: 10,
+  },
   input: {
     borderWidth: 1,
     borderColor: '#ccc',
     padding: 12,
     borderRadius: 8,
     marginBottom: 12,
+    color: '#000',
+    fontSize: 16,
+    height: 48,
+    justifyContent: 'center',
+    paddingHorizontal: 12,
   },
   inputDisabled: {
     borderWidth: 1,
@@ -405,6 +552,65 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     marginBottom: 12,
     backgroundColor: '#eee',
+    color: '#000',
+  },
+
+  inputIconWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    marginBottom: 12,
+    height: 48,
+  },
+
+  inputIcon: {
+    marginRight: 8,
+  },
+
+  inputWithIcon: {
+    flex: 1,
+    height: '100%',
+    color: '#000',
+  },
+  passwordField: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    paddingHorizontal: 10,
+    marginBottom: 12,
+    height: 48,
+    justifyContent: 'space-between',
+  },
+
+  inputWithIconPassword: {
+    flex: 1,
+    color: '#000',
+    fontSize: 16,
+  },
+
+  passwordForm: {
+    marginTop: 20,
+    backgroundColor: '#f9fafb',
+    padding: 12,
+    borderRadius: 8,
+  },
+
+  passwordHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+
+  sectionTitle: {
+    fontSize: 18,
+    fontWeight: '700',
+    color: '#1e3a8a',
   },
   textArea: {
     borderWidth: 1,
@@ -415,7 +621,7 @@ const styles = StyleSheet.create({
     height: 90,
   },
   editBtn: {
-    backgroundColor: '#1e3a8a',
+    backgroundColor: '#606C32',
     padding: 14,
     borderRadius: 8,
     marginBottom: 10,

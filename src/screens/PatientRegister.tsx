@@ -11,6 +11,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import Icon from 'react-native-vector-icons/Feather';
 import { useNavigation } from '@react-navigation/native';
 import type { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import PatientApi from '../utils/Patient_Api';
@@ -26,6 +27,8 @@ type NavigationProp = NativeStackNavigationProp<RootStackParamList>;
 export default function PatientRegister() {
   const navigation = useNavigation<NavigationProp>();
 
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [user, setUser] = useState({
     name: '',
@@ -88,10 +91,12 @@ export default function PatientRegister() {
           style={styles.logo}
           resizeMode="contain"
         />
-        <Text style={styles.title}>Patient Registration</Text>
+        <Text style={styles.title}>REGISTER</Text>
 
         <TextInput
           placeholder="Full Name"
+          placeholderTextColor="#777"
+          underlineColorAndroid="transparent"
           style={styles.input}
           value={user.name}
           onChangeText={text => setUser({ ...user, name: text })}
@@ -99,6 +104,8 @@ export default function PatientRegister() {
 
         <TextInput
           placeholder="Email"
+          placeholderTextColor="#777"
+          underlineColorAndroid="transparent"
           style={styles.input}
           keyboardType="email-address"
           value={user.email}
@@ -107,27 +114,53 @@ export default function PatientRegister() {
 
         <TextInput
           placeholder="Phone"
+          placeholderTextColor="#777"
+          underlineColorAndroid="transparent"
           style={styles.input}
           keyboardType="phone-pad"
           value={user.phone}
           onChangeText={text => setUser({ ...user, phone: text })}
         />
 
-        <TextInput
-          placeholder="Password"
-          style={styles.input}
-          secureTextEntry
-          value={user.password}
-          onChangeText={text => setUser({ ...user, password: text })}
-        />
+        <View style={styles.passwordContainer}>
+          <TextInput
+            placeholder="Password"
+            placeholderTextColor="#777"
+            secureTextEntry={!showPassword}
+            underlineColorAndroid="transparent"
+            style={styles.passwordInput}
+            value={user.password}
+            onChangeText={text => setUser({ ...user, password: text })}
+          />
+          <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+            <Icon
+              name={showPassword ? 'eye-off' : 'eye'}
+              size={20}
+              color="#555"
+            />
+          </TouchableOpacity>
+        </View>
 
-        <TextInput
-          placeholder="Confirm Password"
-          style={styles.input}
-          secureTextEntry
-          value={user.confirmPassword}
-          onChangeText={text => setUser({ ...user, confirmPassword: text })}
-        />
+        <View style={styles.passwordContainer}>
+          <TextInput
+            placeholder="Confirm Password"
+            placeholderTextColor="#777"
+            secureTextEntry={!showConfirmPassword}
+            underlineColorAndroid="transparent"
+            style={styles.passwordInput}
+            value={user.confirmPassword}
+            onChangeText={text => setUser({ ...user, confirmPassword: text })}
+          />
+          <TouchableOpacity
+            onPress={() => setShowConfirmPassword(!showConfirmPassword)}
+          >
+            <Icon
+              name={showConfirmPassword ? 'eye-off' : 'eye'}
+              size={20}
+              color="#555"
+            />
+          </TouchableOpacity>
+        </View>
 
         <TouchableOpacity
           style={[styles.button, loading && styles.disabled]}
@@ -174,11 +207,12 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     textAlign: 'center',
     marginBottom: 16,
+    color: '#606C32',
   },
 
   logo: {
-    width: 120,
-    height: 120,
+    width: 200,
+    height: 200,
     alignSelf: 'center',
     // marginBottom: 2,
   },
@@ -189,9 +223,27 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     marginBottom: 10,
+    color: '#000',
   },
+
+  passwordContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#ddd',
+    borderRadius: 8,
+    paddingHorizontal: 12,
+    marginBottom: 10,
+  },
+
+  passwordInput: {
+    flex: 1,
+    paddingVertical: 12,
+    color: '#000', // TEXT COLOR BLACK
+  },
+
   button: {
-    backgroundColor: '#1D5D9B',
+    backgroundColor: '#606C32',
     padding: 14,
     borderRadius: 8,
     alignItems: 'center',
@@ -210,7 +262,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
   },
   link: {
-    color: '#1D5D9B',
+    color: '#606C32',
     fontWeight: 'bold',
   },
 });

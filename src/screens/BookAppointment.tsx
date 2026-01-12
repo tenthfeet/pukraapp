@@ -118,6 +118,8 @@ const BookAppointment: React.FC = () => {
       <TextInput
         style={styles.input}
         placeholder="Patient Name"
+        placeholderTextColor="#777"
+        underlineColorAndroid="transparent"
         value={formData.name}
         onChangeText={t => handleChange('name', t)}
       />
@@ -125,6 +127,8 @@ const BookAppointment: React.FC = () => {
       <TextInput
         style={styles.input}
         placeholder="Email"
+        placeholderTextColor="#777"
+        underlineColorAndroid="transparent"
         keyboardType="email-address"
         value={formData.email}
         onChangeText={t => handleChange('email', t)}
@@ -133,6 +137,8 @@ const BookAppointment: React.FC = () => {
       <TextInput
         style={styles.input}
         placeholder="Phone"
+        placeholderTextColor="#777"
+        underlineColorAndroid="transparent"
         keyboardType="phone-pad"
         value={formData.phone}
         onChangeText={t => handleChange('phone', t)}
@@ -140,18 +146,28 @@ const BookAppointment: React.FC = () => {
 
       {/* DATE */}
       <TouchableOpacity
-        style={styles.input}
+        style={styles.iconInput}
         onPress={() => setPickerMode('date')}
       >
-        <Text>{formData.date || 'Select Date'}</Text>
+        <Text
+          style={[styles.inputText, !formData.date && styles.placeholderText]}
+        >
+          {formData.date || 'Select Date'}
+        </Text>
+        <Icon name="calendar-outline" size={20} color="#606C32" />
       </TouchableOpacity>
 
       {/* TIME */}
       <TouchableOpacity
-        style={styles.input}
+        style={styles.iconInput}
         onPress={() => setPickerMode('time')}
       >
-        <Text>{formData.time || 'Select Time'}</Text>
+        <Text
+          style={[styles.inputText, !formData.time && styles.placeholderText]}
+        >
+          {formData.time || 'Select Time'}
+        </Text>
+        <Icon name="time-outline" size={20} color="#606C32" />
       </TouchableOpacity>
 
       {/* SINGLE PICKER (HOOK SAFE) */}
@@ -177,6 +193,8 @@ const BookAppointment: React.FC = () => {
       <TextInput
         style={styles.input}
         placeholder="Symptoms"
+        placeholderTextColor="#777"
+        underlineColorAndroid="transparent"
         value={formData.symptoms}
         onChangeText={t => handleChange('symptoms', t)}
       />
@@ -184,6 +202,8 @@ const BookAppointment: React.FC = () => {
       <TextInput
         style={[styles.input, styles.textArea]}
         placeholder="Description"
+        placeholderTextColor="#777"
+        underlineColorAndroid="transparent"
         multiline
         value={formData.description}
         onChangeText={t => handleChange('description', t)}
@@ -243,6 +263,28 @@ const styles = StyleSheet.create({
     padding: 12,
     marginBottom: 12,
     backgroundColor: '#f9f9f9',
+    color: '#000', // TEXT BLACK (APK FIX)
+  },
+
+  iconInput: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderWidth: 1,
+    borderColor: '#ccc',
+    borderRadius: 8,
+    padding: 12,
+    marginBottom: 12,
+    backgroundColor: '#f9f9f9',
+  },
+
+  inputText: {
+    color: '#000',
+    fontSize: 16,
+  },
+
+  placeholderText: {
+    color: '#777',
   },
   textArea: {
     height: 100,

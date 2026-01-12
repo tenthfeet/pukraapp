@@ -20,7 +20,7 @@ const MainTabNavigator = () => {
     <Tab.Navigator
       screenOptions={({ route }) => ({
         headerShown: false,
-        tabBarActiveTintColor: "#1D5D9B", // Active icon color
+        tabBarActiveTintColor: "#606C32", // Active icon color
         tabBarInactiveTintColor: "#555",  // Inactive icon color
         tabBarIcon: ({ focused, color, size }) => {
           let iconName: string;

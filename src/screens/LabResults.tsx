@@ -153,12 +153,17 @@ const LabResults: React.FC = () => {
       </View>
 
       {/* Search */}
-      <TextInput
-        placeholder="Search test..."
-        style={styles.search}
-        value={search}
-        onChangeText={setSearch}
-      />
+      <View style={styles.searchBox}>
+        <IonIcon name="search-outline" size={20} color="#888" />
+
+        <TextInput
+          placeholder="Search test..."
+          placeholderTextColor="#888" // ✅ gray placeholder
+          value={search}
+          onChangeText={setSearch}
+          style={styles.searchInput}
+        />
+      </View>
 
       {/* Filter */}
       <View style={styles.filterRow}>
@@ -216,12 +221,23 @@ const styles = StyleSheet.create({
     fontWeight: '700',
   },
 
-  search: {
+  searchBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
     borderWidth: 1,
     borderColor: '#ccc',
     borderRadius: 8,
-    padding: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
     marginBottom: 10,
+    backgroundColor: '#fff',
+  },
+
+  searchInput: {
+    flex: 1,
+    marginLeft: 8,
+    color: '#000',
+    fontSize: 16,
   },
 
   filterRow: {
