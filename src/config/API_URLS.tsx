@@ -2,7 +2,7 @@ import { API_BASE_URL } from '@env';
 console.log('Base URL', API_BASE_URL);
 
 const API_URLS = {
-  BASE_URL: API_BASE_URL || 'https://c903ffa839ce.ngrok-free.appp',
+  BASE_URL: API_BASE_URL || ' https://5276afa69cfe.ngrok-free.app ',
 
   // Public
   DOCTORS: '/doctors',
