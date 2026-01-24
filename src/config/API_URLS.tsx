@@ -14,6 +14,7 @@ const API_URLS = {
   // Patient Authenticationy
   PATIENT_REGISTER: '/api/register',
   PATIENT_LOGIN: '/api/login',
+  PATIENT_FORGOT_PASSWORD: "api/forgot-password",
   PATIENT_LOGOUT: '/api/patient/logout',
   PATIENT_PROFILE: '/api/patient/profile',
   PATIENT_CHANGE_PASSWORD: '/api/patient/change-password',

@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   Alert,
   Image,
+  Modal,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/Feather';
 import { useNavigation } from '@react-navigation/native';
@@ -22,6 +23,12 @@ const PatientLogin: React.FC = () => {
   const [password, setPassword] = useState<string>('');
   const [loading, setLoading] = useState<boolean>(false);
   const [showPassword, setShowPassword] = useState<boolean>(false);
+
+  // --- Forgot Password Modal State ---
+  const [showForgotModal, setShowForgotModal] = useState(false);
+  const [resetEmail, setResetEmail] = useState('');
+  const [resetLoading, setResetLoading] = useState(false);
+  const [resetMessage, setResetMessage] = useState('');
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -63,6 +70,32 @@ const PatientLogin: React.FC = () => {
       );
     } finally {
       setLoading(false);
+    }
+  };
+
+  // --- FORGOT PASSWORD ---
+  const handleForgotPassword = async () => {
+    if (!resetEmail) {
+      Alert.alert('Validation Error', 'Enter your registered email');
+      return;
+    }
+    setResetLoading(true);
+    setResetMessage('');
+
+    try {
+      const res = await PatientApi.post(API_URLS.PATIENT_FORGOT_PASSWORD, {
+        email: resetEmail,
+      });
+
+      // Set success message
+      setResetMessage(res.data.message || 'Reset link sent! Check your email.');
+
+      // CLEAR the email field after sending
+      setResetEmail('');
+    } catch (err: any) {
+      setResetMessage(err.response?.data?.message || 'Something went wrong');
+    } finally {
+      setResetLoading(false);
     }
   };
 
@@ -125,6 +158,16 @@ const PatientLogin: React.FC = () => {
           )}
         </TouchableOpacity>
 
+        {/* FORGOT PASSWORD */}
+        <TouchableOpacity
+          style={{ alignSelf: 'flex-end', marginTop: 8 }}
+          onPress={() => setShowForgotModal(true)}
+        >
+          <Text style={{ color: '#606C32', textDecorationLine: 'underline' }}>
+            Forgot Password?
+          </Text>
+        </TouchableOpacity>
+
         {/* REGISTER */}
         <Text style={styles.registerText}>
           Create a new account?
@@ -137,6 +180,54 @@ const PatientLogin: React.FC = () => {
           </Text>
         </Text>
       </View>
+      {/* --- FORGOT PASSWORD MODAL --- */}
+      <Modal visible={showForgotModal} transparent animationType="fade">
+        <View style={styles.overlay}>
+          <View style={[styles.card, { width: '85%' }]}>
+            <TouchableOpacity
+              style={{ alignSelf: 'flex-end' }}
+              onPress={() => {
+                setShowForgotModal(false);
+                setResetMessage('');
+              }}
+            >
+              <Text style={{ fontSize: 18 }}>✕</Text>
+            </TouchableOpacity>
+
+            <Text style={[styles.title, { fontSize: 20, marginBottom: 12 }]}>
+              Forgot Password
+            </Text>
+
+            <TextInput
+              placeholder="Enter your registered email"
+              placeholderTextColor="#777"
+              keyboardType="email-address"
+              autoCapitalize="none"
+              style={styles.input}
+              value={resetEmail}
+              onChangeText={setResetEmail}
+            />
+
+            <TouchableOpacity
+              style={[styles.button, resetLoading && styles.disabledBtn]}
+              disabled={resetLoading}
+              onPress={handleForgotPassword}
+            >
+              {resetLoading ? (
+                <ActivityIndicator color="#fff" />
+              ) : (
+                <Text style={styles.btnText}>Send Reset Link</Text>
+              )}
+            </TouchableOpacity>
+
+            {resetMessage.length > 0 && (
+              <Text style={{ textAlign: 'center', marginTop: 8 }}>
+                {resetMessage}
+              </Text>
+            )}
+          </View>
+        </View>
+      </Modal>
     </View>
   );
 };
@@ -182,7 +273,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: 12,
     marginBottom: 12,
-    color: '#000', 
+    color: '#000',
   },
 
   passwordContainer: {
