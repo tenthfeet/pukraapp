@@ -41,14 +41,12 @@ const FindDoctor: React.FC = () => {
   const [btnLoading, setBtnLoading] = useState(false);
 
   const [showDatePicker, setShowDatePicker] = useState(false);
-  const [showTimePicker, setShowTimePicker] = useState(false);
 
   const [form, setForm] = useState({
     name: '',
     email: '',
     phone: '',
     date: '',
-    time: '',
     symptoms: '',
     description: '',
   });
@@ -96,7 +94,7 @@ const FindDoctor: React.FC = () => {
   const submitAppointment = async () => {
     if (!selectedDoctor) return;
 
-    if (!form.name || !form.email || !form.phone || !form.date || !form.time) {
+    if (!form.name || !form.email || !form.phone || !form.date) {
       Alert.alert('Validation', 'Please fill all required fields');
       return;
     }
@@ -110,8 +108,7 @@ const FindDoctor: React.FC = () => {
         name: form.name,
         email: form.email,
         phone: form.phone,
-        date: form.date, // YYYY-MM-DD
-        time: form.time, // HH:mm ✅
+        date: form.date,
         symptoms: form.symptoms,
         description: form.description,
       });
@@ -128,7 +125,6 @@ const FindDoctor: React.FC = () => {
         email: '',
         phone: '',
         date: '',
-        time: '',
         symptoms: '',
         description: '',
       });
@@ -214,7 +210,7 @@ const FindDoctor: React.FC = () => {
         />
       )}
 
-      {/* ================= BOOKING MODAL ================= */}
+      {/* BOOKING MODAL */}
 
       <Modal visible={showPopup} transparent animationType="slide">
         <View style={styles.modalBg}>
@@ -278,36 +274,6 @@ const FindDoctor: React.FC = () => {
               />
             )}
 
-            {/* TIME */}
-            <TouchableOpacity
-              style={styles.iconInput}
-              onPress={() => setShowTimePicker(true)}
-            >
-              <Text
-                style={[styles.inputText, !form.time && styles.placeholderText]}
-              >
-                {form.time || 'Select Time'}
-              </Text>
-              <Icon name="time-outline" size={20} color="#606C32" />
-            </TouchableOpacity>
-
-            {showTimePicker && (
-              <DateTimePicker
-                value={new Date()}
-                mode="time"
-                is24Hour={true}
-                onChange={(e, t) => {
-                  setShowTimePicker(false);
-                  if (t) {
-                    setForm({
-                      ...form,
-                      time: t.toTimeString().slice(0, 5), // ✅ FIX
-                    });
-                  }
-                }}
-              />
-            )}
-
             <TextInput
               placeholder="Symptoms"
               placeholderTextColor="#888"
@@ -341,13 +307,53 @@ const FindDoctor: React.FC = () => {
           </View>
         </View>
       </Modal>
+
+      {/* ================= PROFILE MODAL ================= */}
+
+      <Modal visible={showProfile} transparent animationType="fade">
+        <View style={styles.modalBg}>
+          <View style={styles.profileCard}>
+            {/* Close */}
+            <TouchableOpacity
+              style={styles.closeBtn}
+              onPress={() => setShowProfile(false)}
+            >
+              <Icon name="close" size={22} color="#333" />
+            </TouchableOpacity>
+
+            {/* Doctor Image */}
+            <Image
+              source={{ uri: selectedDoctor?.img }}
+              style={styles.profileImg}
+            />
+
+            {/* Doctor Info */}
+            <Text style={styles.profileName}>{selectedDoctor?.name}</Text>
+            <Text style={styles.profileDegree}>{selectedDoctor?.degree}</Text>
+            <Text style={styles.profileRole}>{selectedDoctor?.role}</Text>
+
+            {/* Book Button */}
+            <TouchableOpacity
+              style={styles.mainBtn}
+              onPress={() => {
+                setShowProfile(false);
+                setShowPopup(true);
+              }}
+            >
+              <Text style={{ color: '#fff', fontWeight: '600' }}>
+                Book Appointment →
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </ScrollView>
   );
 };
 
 export default FindDoctor;
 
-/* ================= STYLES ================= */
+/* STYLES */
 
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: '#F9FAFB', padding: 16 },
@@ -466,5 +472,32 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     width: '100%',
     alignItems: 'center',
+  },
+
+  profileCard: {
+    backgroundColor: '#fff',
+    margin: 20,
+    padding: 24,
+    borderRadius: 20,
+    alignItems: 'center',
+    position: 'relative',
+  },
+
+  closeBtn: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+  },
+
+  profileDegree: {
+    fontSize: 14,
+    color: '#555',
+  },
+
+  profileRole: {
+    fontSize: 15,
+    fontWeight: '600',
+    color: '#606C32',
+    marginBottom: 16,
   },
 });

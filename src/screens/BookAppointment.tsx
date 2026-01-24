@@ -20,12 +20,11 @@ interface FormState {
   email: string;
   phone: string;
   date: string;
-  time: string;
   symptoms: string;
   description: string;
 }
 
-type PickerMode = 'date' | 'time' | null;
+type PickerMode = 'date' | null;
 
 const BookAppointment: React.FC = () => {
   const navigation = useNavigation();
@@ -37,7 +36,6 @@ const BookAppointment: React.FC = () => {
     email: '',
     phone: '',
     date: '',
-    time: '',
     symptoms: '',
     description: '',
   });
@@ -53,8 +51,7 @@ const BookAppointment: React.FC = () => {
       !formData.name ||
       !formData.email ||
       !formData.phone ||
-      !formData.date ||
-      !formData.time
+      !formData.date
     ) {
       Alert.alert('Validation Error', 'Please fill all required fields');
       return;
@@ -68,8 +65,7 @@ const BookAppointment: React.FC = () => {
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
-        date: formData.date, // YYYY-MM-DD
-        time: formData.time, // HH:mm
+        date: formData.date,
         symptoms: formData.symptoms,
         description: formData.description,
       });
@@ -86,7 +82,6 @@ const BookAppointment: React.FC = () => {
         email: '',
         phone: '',
         date: '',
-        time: '',
         symptoms: '',
         description: '',
       });
@@ -157,19 +152,6 @@ const BookAppointment: React.FC = () => {
         <Icon name="calendar-outline" size={20} color="#606C32" />
       </TouchableOpacity>
 
-      {/* TIME */}
-      <TouchableOpacity
-        style={styles.iconInput}
-        onPress={() => setPickerMode('time')}
-      >
-        <Text
-          style={[styles.inputText, !formData.time && styles.placeholderText]}
-        >
-          {formData.time || 'Select Time'}
-        </Text>
-        <Icon name="time-outline" size={20} color="#606C32" />
-      </TouchableOpacity>
-
       {/* SINGLE PICKER (HOOK SAFE) */}
       {pickerMode && (
         <DateTimePicker
@@ -183,8 +165,6 @@ const BookAppointment: React.FC = () => {
 
             if (pickerMode === 'date') {
               handleChange('date', selectedDate.toISOString().split('T')[0]);
-            } else {
-              handleChange('time', selectedDate.toTimeString().slice(0, 5));
             }
           }}
         />

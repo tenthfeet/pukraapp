@@ -81,7 +81,7 @@ const Home: React.FC = () => {
   const [showForm, setShowForm] = useState(false);
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
   const [btnLoading, setBtnLoading] = useState(false);
-  type PickerMode = 'date' | 'time' | null;
+  type PickerMode = 'date' | null;
   const [pickerMode, setPickerMode] = useState<PickerMode>(null);
 
   const [form, setForm] = useState({
@@ -89,7 +89,6 @@ const Home: React.FC = () => {
     email: '',
     phone: '',
     date: '',
-    time: '',
     symptoms: '',
     description: '',
   });
@@ -183,7 +182,7 @@ const Home: React.FC = () => {
   const submitAppointment = async () => {
     if (!selectedDoctor) return;
 
-    if (!form.name || !form.email || !form.phone || !form.date || !form.time) {
+    if (!form.name || !form.email || !form.phone || !form.date) {
       Alert.alert('Validation', 'Please fill all required fields');
       return;
     }
@@ -197,8 +196,7 @@ const Home: React.FC = () => {
         name: form.name,
         email: form.email,
         phone: form.phone,
-        date: form.date, // YYYY-MM-DD
-        time: form.time, // HH:mm ✅
+        date: form.date, 
         symptoms: form.symptoms,
         description: form.description,
       });
@@ -215,7 +213,6 @@ const Home: React.FC = () => {
         email: '',
         phone: '',
         date: '',
-        time: '',
         symptoms: '',
         description: '',
       });
@@ -493,20 +490,6 @@ const Home: React.FC = () => {
               <Icon name="calendar-outline" size={20} color="#606C32" />
             </TouchableOpacity>
 
-            {/* TIME */}
-            <TouchableOpacity
-              style={styles.iconInput}
-              onPress={() => setPickerMode('time')}
-            >
-              <Text
-                style={[styles.inputText, !form.time && styles.placeholderText]}
-              >
-                {form.time || 'Select Time'}
-              </Text>
-
-              <Icon name="time-outline" size={20} color="#606C32" />
-            </TouchableOpacity>
-
             {/* SINGLE PICKER – HOOK SAFE */}
             {pickerMode && (
               <DateTimePicker
@@ -522,11 +505,6 @@ const Home: React.FC = () => {
                     setForm({
                       ...form,
                       date: selectedDate.toISOString().split('T')[0],
-                    });
-                  } else {
-                    setForm({
-                      ...form,
-                      time: selectedDate.toTimeString().slice(0, 5),
                     });
                   }
                 }}
