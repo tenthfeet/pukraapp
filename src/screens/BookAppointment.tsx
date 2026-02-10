@@ -44,7 +44,7 @@ const BookAppointment: React.FC = () => {
     setFormData(prev => ({ ...prev, [key]: value }));
   };
 
-  /* ================= SUBMIT APPOINTMENT ================= */
+  /* SUBMIT APPOINTMENT */
 
   const submitAppointment = async () => {
     if (
@@ -93,7 +93,7 @@ const BookAppointment: React.FC = () => {
     }
   };
 
-  /* ================= UI ================= */
+  /* UI */
 
   return (
     <ScrollView style={styles.container}>

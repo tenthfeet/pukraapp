@@ -14,6 +14,8 @@ import {
   Dimensions,
 } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
+import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import { RootStackParamList } from '../../App';
 import Icon from 'react-native-vector-icons/Ionicons';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import Api from '../utils/Api';
@@ -29,13 +31,13 @@ interface Doctor {
 }
 
 const FindDoctor: React.FC = () => {
-  const navigation = useNavigation();
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [filteredDoctors, setFilteredDoctors] = useState<Doctor[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
 
-  const [showProfile, setShowProfile] = useState(false);
   const [showPopup, setShowPopup] = useState(false);
   const [selectedDoctor, setSelectedDoctor] = useState<Doctor | null>(null);
   const [btnLoading, setBtnLoading] = useState(false);
@@ -51,7 +53,7 @@ const FindDoctor: React.FC = () => {
     description: '',
   });
 
-  /* ================= FETCH DOCTORS ================= */
+  /* FETCH DOCTORS */
 
   useEffect(() => {
     Api.get(API_URLS.DOCTORS)
@@ -136,7 +138,7 @@ const FindDoctor: React.FC = () => {
     }
   };
 
-  /* ================= RENDER DOCTOR CARD ================= */
+  /* RENDER DOCTOR CARD */
 
   const renderDoctor = ({ item }: { item: Doctor }) => (
     <View style={styles.card}>
@@ -148,10 +150,11 @@ const FindDoctor: React.FC = () => {
       <View style={styles.btnRow}>
         <TouchableOpacity
           style={styles.outlinedBtn}
-          onPress={() => {
-            setSelectedDoctor(item);
-            setShowProfile(true);
-          }}
+          onPress={() =>
+            navigation.navigate('DoctorProfile', {
+              doctorName: item.name,
+            })
+          }
         >
           <Text style={styles.outlinedText}>View</Text>
         </TouchableOpacity>
@@ -303,46 +306,6 @@ const FindDoctor: React.FC = () => {
 
             <TouchableOpacity onPress={() => setShowPopup(false)}>
               <Text style={{ color: 'red', marginTop: 10 }}>Cancel</Text>
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
-
-      {/* ================= PROFILE MODAL ================= */}
-
-      <Modal visible={showProfile} transparent animationType="fade">
-        <View style={styles.modalBg}>
-          <View style={styles.profileCard}>
-            {/* Close */}
-            <TouchableOpacity
-              style={styles.closeBtn}
-              onPress={() => setShowProfile(false)}
-            >
-              <Icon name="close" size={22} color="#333" />
-            </TouchableOpacity>
-
-            {/* Doctor Image */}
-            <Image
-              source={{ uri: selectedDoctor?.img }}
-              style={styles.profileImg}
-            />
-
-            {/* Doctor Info */}
-            <Text style={styles.profileName}>{selectedDoctor?.name}</Text>
-            <Text style={styles.profileDegree}>{selectedDoctor?.degree}</Text>
-            <Text style={styles.profileRole}>{selectedDoctor?.role}</Text>
-
-            {/* Book Button */}
-            <TouchableOpacity
-              style={styles.mainBtn}
-              onPress={() => {
-                setShowProfile(false);
-                setShowPopup(true);
-              }}
-            >
-              <Text style={{ color: '#fff', fontWeight: '600' }}>
-                Book Appointment →
-              </Text>
             </TouchableOpacity>
           </View>
         </View>

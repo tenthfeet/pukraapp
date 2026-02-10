@@ -2,7 +2,7 @@ import { API_BASE_URL } from '@env';
 console.log('Base URL', API_BASE_URL);
 
 const API_URLS = {
-  BASE_URL: API_BASE_URL || ' https://3d28ec570fea.ngrok-free.app ',
+  BASE_URL: API_BASE_URL || 'https://api.pukra.in',
 
   // Public
   DOCTORS: '/doctors',
