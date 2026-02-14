@@ -412,6 +412,13 @@ const PatientProfile: React.FC = () => {
         </TouchableOpacity>
       )}
 
+      <TouchableOpacity
+        style={styles.passwordBtn}
+        onPress={() => navigation.navigate('MyAppointments')}
+      >
+        <Text style={styles.btnText}>My Booked Appointments</Text>
+      </TouchableOpacity>
+
       <TouchableOpacity style={styles.passwordBtn} onPress={handleLogout}>
         <Text style={styles.btnText}>Log Out</Text>
       </TouchableOpacity>

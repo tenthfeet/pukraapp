@@ -2,7 +2,7 @@ import { API_BASE_URL } from '@env';
 console.log('Base URL', API_BASE_URL);
 
 const API_URLS = {
-  BASE_URL: API_BASE_URL || 'https://api.pukra.in',
+  BASE_URL: API_BASE_URL || ' https://4882-117-193-131-68.ngrok-free.app ',
 
   // Public
   DOCTORS: '/doctors',
@@ -19,6 +19,7 @@ const API_URLS = {
   PATIENT_PROFILE: '/api/patient/profile',
   PATIENT_CHANGE_PASSWORD: '/api/patient/change-password',
   APPOINTMENTS: '/api/patient/appointment',
+  MY_APPOINTMENTS: '/api/patient/myappointments',
 };
 
 export default API_URLS;

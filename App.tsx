@@ -7,6 +7,7 @@ import MainTabNavigator from './src/components/MainTabNavigator';
 import PatientDashboard from './src/screens/PatientDashboard';
 import LabResults from './src/screens/LabResults';
 import DoctorProfile from './src/screens/DoctorProfile';
+import MyAppointments from './src/screens/MyAppointments';
 
 export type RootStackParamList = {
   Login: undefined;
@@ -18,6 +19,8 @@ export type RootStackParamList = {
   DoctorProfile: {
     doctorName: string;
   };
+
+  MyAppointments: undefined; 
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -32,6 +35,7 @@ const App: React.FC = () => {
         <Stack.Screen name="PatientDashboard" component={PatientDashboard} />
         <Stack.Screen name="LabResult" component={LabResults} />
         <Stack.Screen name="DoctorProfile" component={DoctorProfile} />
+        <Stack.Screen name="MyAppointments" component={MyAppointments} />
       </Stack.Navigator>
     </NavigationContainer>
   );
