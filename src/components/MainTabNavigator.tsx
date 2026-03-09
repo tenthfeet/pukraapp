@@ -9,7 +9,7 @@ import Ionicons from 'react-native-vector-icons/Ionicons';
 export type BottomTabParamList = {
   Home: undefined;
   FindDoctor: undefined;
-  BookAppointment: undefined;
+  Appointments: undefined;
   Profile: undefined;
 };
 
@@ -32,7 +32,7 @@ const MainTabNavigator = () => {
             case "FindDoctor":
               iconName = focused ? "medkit" : "medkit-outline";
               break;
-            case "BookAppointment":
+            case "Appointments":
               iconName = focused ? "calendar" : "calendar-outline";
               break;
             case "Profile":
@@ -48,7 +48,7 @@ const MainTabNavigator = () => {
     >
       <Tab.Screen name="Home" component={HomeScreen} />
       <Tab.Screen name="FindDoctor" component={FindDoctorScreen} />
-      <Tab.Screen name="BookAppointment" component={BookAppointment} />
+      <Tab.Screen name="Appointments" component={BookAppointment} />
       <Tab.Screen name="Profile" component={ProfileScreen} />
     </Tab.Navigator>
   );
